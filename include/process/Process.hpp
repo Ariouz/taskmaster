@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Status.hpp"
 #include <sys/types.h>
 #include <ctime>
