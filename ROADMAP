@@ -3,7 +3,9 @@
 [] - Gestion process => fork/execve, etats de process, detection process mort waitpid(WNOHANG), umask(int) avant execve
 [] - Boucle d'autorestart
 [] - Gestion sig SIGHUB (reload config), SIGCHLD (fin de process), SIGINT/SIGTERM (clean exit)
-[] - Gestion des logs => Logger (global), redirection des sorties vers fd pour les process => dup2 + fichier (def dans config)
+Gestion des logs:
+[OK] => Logger (global)
+[] => Redirection des sorties std vers fd pour les process => dup2 + fichier (def dans config)
 [] - Shell interactif => lib readline => status de process, start/stop/restart, reload, quit 
   
 BONUS:
