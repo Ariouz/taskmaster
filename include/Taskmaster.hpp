@@ -14,7 +14,6 @@ class Taskmaster {
         Config          _config;
         ProcessManager  _process_manager;
         Shell           _shell;
-        Logger          _logger;
         std::string     _configFile;
 
     public:

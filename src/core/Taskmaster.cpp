@@ -1,8 +1,8 @@
 #include "Taskmaster.hpp"
 
-Taskmaster::Taskmaster( const std::string& configFile ) : _config(configFile), _logger("taskmaster.log"), _configFile(configFile) {
+Taskmaster::Taskmaster(const std::string& configFile) : _config(configFile), _configFile(configFile) {
     fileChecker();
-    std::cout << "Loaded taskmaster with config file " << configFile << std::endl; // TODO => USE LOGGER
+    Logger::info("Loaded taskmaster with config file " + configFile);
 }
 
 Taskmaster::~Taskmaster() = default;

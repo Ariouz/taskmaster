@@ -1,9 +1,26 @@
 [DOING] - Structure projet => Makefile, classes générales, utils
 [] - Lecture config et init
-[] - Gestion process => fork/execve, etats de process, detection process mort waitpid(WNOHANG), umask(int) avant execve
-[] - Boucle d'autorestart
+
+Gestion process:
+[] - Boucle processes => umask(int) + fork + chdir(workdir config) + setenv
+[] - dup2 des stderr/out ou /dev/null si non spécifiés
+[] - check si le binaire de la cmd existe => execve
+[] - parent => stocker pid, start, status => process
+
+Boucle monitoring:
+    [] - waitpid(pid, &status, WNOHAND) => detection process mort + log => > 0 = mort: WIFEXITED, WEXITSTATUS (comparer avec exit_codes), WIFSIGNALED
+    [] - check si time-start_time > X secondes => retry ou non
+    [] - Maj status process + log
+    Autorestart:
+        [] - check autorestart pour le process fail
+        [] - Retry jusqu'au max_retries + log
+
+Signaux:
 [] - Gestion sig SIGHUB (reload config), SIGCHLD (fin de process), SIGINT/SIGTERM (clean exit)
-[] - Gestion des logs => Logger (global), redirection des sorties vers fd pour les process
+
+Gestion des logs:
+[OK] => Logger (global)
+[] => Redirection des sorties std vers fd pour les process => dup2 + fichier (def dans config)
 [] - Shell interactif => lib readline => status de process, start/stop/restart, reload, quit 
   
 BONUS:

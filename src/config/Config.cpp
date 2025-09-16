@@ -1,7 +1,8 @@
 #include "Config.hpp"
+#include "Logger.hpp"
 
 Config::Config(const std::string& filePath) : _filePath(filePath) {
-    std::cout << "Loading config file ..." << std::endl;
+    Logger::info("Loading config file...");
     //load();
 }
 
