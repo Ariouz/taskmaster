@@ -1,0 +1,13 @@
+[DOING] - Structure projet => Makefile, classes générales, utils
+[] - Lecture config et init
+[] - Gestion process => fork/execve, etats de process, detection process mort waitpid(WNOHANG), umask(int) avant execve
+[] - Boucle d'autorestart
+[] - Gestion sig SIGHUB (reload config), SIGCHLD (fin de process), SIGINT/SIGTERM (clean exit)
+[] - Gestion des logs => Logger (global), redirection des sorties vers fd pour les process
+[] - Shell interactif => lib readline => status de process, start/stop/restart, reload, quit 
+  
+BONUS:
+[] => Shell: tab completion, history
+[] => Logging http/mail
+[] => Shell/Server séparés
+[] => Attach/detach
