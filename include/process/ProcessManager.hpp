@@ -12,10 +12,16 @@ class ProcessManager {
         ProcessManager();
         ~ProcessManager();
 
+        // temp methods
+        void        init();
+        Process     createProcess(const ProgramConfig& cfg);
+
+        void monitor();
+        void handleAutoRestart(Process& process, int code, bool killedBySignal = false);
+
         void start(ProgramConfig& config);
         void stop(std::string name);
         void restart(std::string name);
-        void monitor();
         void handleSigchld(int sig);
 
 };

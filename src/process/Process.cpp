@@ -1,4 +1,55 @@
 #include "Process.hpp"
+#include "SigUtils.hpp"
+#include "ExitUtils.hpp"
+#include <algorithm>
 
-Process::Process(pid_t pid, Status status = Status::STARTING) : _pid(pid), _status(status), _start_time(std::time(nullptr)) {}
+Process::Process() = default;
+Process::Process(pid_t pid, Status status, ProgramConfig config) 
+: _name(config.name), _pid(pid), _status(status), _start_time(std::time(nullptr)), _config(config) {}
+
 Process::~Process() = default;
+
+std::string Process::getName() const {
+    return this->_name;
+}
+
+int Process::getPid() const {
+    return this->_pid;
+}
+
+int Process::getRetries() const {
+    return this->_retries;
+}
+
+Status Process::getStatus() const {
+    return this->_status;
+}
+
+ProgramConfig  Process::getConfig() const {
+    return this->_config;
+}
+
+time_t    Process::getStartTime() const {
+    return this->_start_time;
+}
+
+void    Process::setStatus(Status status) {
+    this->_status = status;
+}
+
+void    Process::setRetries(int retries) {
+    this->_retries = retries;
+}
+
+bool  Process::shouldRestart(int exitCode, bool killedBySignal = false) const {
+    if (this->_config.autorestart == ProgramConfig::AutoRestart::NEVER) return false;
+    if (this->_retries >= this->_config.startretries) return false;
+
+    if (this->_config.autorestart == ProgramConfig::AutoRestart::UNEXPECTED) {
+
+        if (killedBySignal && SigUtils::isStopSignal(*this, exitCode)) return false;
+        if (ExitUtils::isExpectedExit(*this, exitCode)) return false;
+    }
+
+    return true;
+}

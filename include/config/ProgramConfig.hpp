@@ -6,6 +6,7 @@
 #include <map>
 
 struct ProgramConfig {
+    std::string name;
     std::string cmd;
     int numprocs = 1;
     bool autostart = false;
@@ -19,5 +20,5 @@ struct ProgramConfig {
     std::string stderr_file;
     std::map<std::string, std::string> env;
     std::string workingdir = ".";
-    mode_t umask = 022;
+    mode_t umask = 000;
 };
