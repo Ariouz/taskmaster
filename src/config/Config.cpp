@@ -1,9 +1,25 @@
 #include "Config.hpp"
 #include "Logger.hpp"
 
+Config::Config( void ) = default;
+
 Config::Config(const std::string& filePath) : _filePath(filePath) {
     Logger::info("Loading config file...");
-    //load();
+    load();
 }
 
 Config::~Config() = default;
+
+void    Config::load() {
+    YAML::Node config = YAML::LoadFile(this->_filePath);
+
+    YAML::Node programs = config["programs"];
+    for (auto it = programs.begin(); it != programs.end(); ++it) {
+        std::string program_name = it->first.as<std::string>();
+        YAML::Node node = it->second;
+
+        ProgramConfig progconf(node);
+        this->_programs[program_name] = progconf;
+    }
+
+}

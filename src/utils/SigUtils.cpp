@@ -16,5 +16,5 @@ int SigUtils::strToSignal(const std::string& sigStr) {
 }
 
 bool SigUtils::isStopSignal(const Process& process, int exitCode) {
-    return exitCode == SigUtils::strToSignal(process.getConfig().stopsignal);
+    return exitCode == SigUtils::strToSignal(process.getConfig().getStopsignal());
 }

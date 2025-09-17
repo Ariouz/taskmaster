@@ -5,7 +5,7 @@
 
 Process::Process() = default;
 Process::Process(pid_t pid, Status status, ProgramConfig config) 
-: _name(config.name), _pid(pid), _status(status), _start_time(std::time(nullptr)), _config(config) {}
+: _name(config.getProgramName()), _pid(pid), _status(status), _start_time(std::time(nullptr)), _config(config) {}
 
 Process::~Process() = default;
 
@@ -42,10 +42,10 @@ void    Process::setRetries(int retries) {
 }
 
 bool  Process::shouldRestart(int exitCode, bool killedBySignal = false) const {
-    if (this->_config.autorestart == ProgramConfig::AutoRestart::NEVER) return false;
-    if (this->_retries >= this->_config.startretries) return false;
+    if (this->_config.getAutorestart() == "never") return false;
+    if (this->_retries >= this->_config.getStartretries()) return false;
 
-    if (this->_config.autorestart == ProgramConfig::AutoRestart::UNEXPECTED) {
+    if (this->_config.getAutorestart() == "unexpected") {
 
         if (killedBySignal && SigUtils::isStopSignal(*this, exitCode)) return false;
         if (ExitUtils::isExpectedExit(*this, exitCode)) return false;

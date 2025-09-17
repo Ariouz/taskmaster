@@ -6,15 +6,14 @@
 ProcessManager::ProcessManager() = default;
 ProcessManager::~ProcessManager() = default;
 
-
 ///////////---  TEMP METHOD ---///////////
 void ProcessManager::init() {
     ProgramConfig cfg;
-    cfg.name = "Echo";
-    cfg.cmd = "echo test";
-    cfg.autostart = true;
+    cfg.setProgramName("Echo");
+    cfg.setCmd("echo test");
+    cfg.setAutostart(true);
 
-    if (!cfg.autostart) return ;
+    if (!cfg.getAutostart()) return;
 
     Process process = createProcess(cfg);
     if (process.getPid() == -1) return;
@@ -27,17 +26,17 @@ Process ProcessManager::createProcess(const ProgramConfig& cfg) {
     int pid = fork();
 
     if (pid == -1) {
-        Logger::error("Failed to fork process " + cfg.name);
+        Logger::error("Failed to fork process " + cfg.getProgramName());
         return Process(pid, Status::FATAL, cfg);
     }
 
     if (pid == 0) { // child
-        execlp("sh", "sh", "-c", cfg.cmd.c_str(), nullptr);
+        execlp("sh", "sh", "-c", cfg.getCmd().c_str(), nullptr);
         _exit(EXIT_FAILURE);
     }
 
     else { // parent
-        Logger::info("Started process " + cfg.name + " with pid " + std::to_string(pid));
+        Logger::info("Started process " + cfg.getProgramName() + " with pid " + std::to_string(pid));
         Process process = Process(pid, Status::STARTING, cfg);
         return process;
     }
