@@ -1,6 +1,6 @@
 #include "Taskmaster.hpp"
 
-Taskmaster::Taskmaster(const std::string& configFile) : _config(configFile), _configFile(configFile) {
+Taskmaster::Taskmaster(const std::string& configFile) : _config(configFile) {
     fileChecker();
     Logger::info("Loaded taskmaster with config file " + configFile);
 }
