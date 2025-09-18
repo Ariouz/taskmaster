@@ -3,13 +3,13 @@
 ProgramConfig::ProgramConfig( void ) = default;
 
 ProgramConfig::ProgramConfig(const YAML::Node& node) {
-
+    
     this->_cmd = node["cmd"].as<std::string>();
     this->_numprocs = node["numprocs"].as<int>();
     this->_umask = node["umask"].as<mode_t>();
     this->_workingdir = node["workingdir"].as<std::string>();
     this->_autostart = node["autostart"].as<bool>();
-    this->_autorestart = node["autorestart"].as<std::string>();
+    this->_autorestart = parseAutoRestart(node["autorestart"].as<std::string>());
     if (node["exitcodes"]) {
         if (node["exitcodes"].IsSequence()) {
             this->_exitcodes = node["exitcodes"].as<std::vector<int>>();
@@ -54,7 +54,7 @@ bool ProgramConfig::getAutostart( void ) const {
     return this->_autostart;
 }
 
-std::string ProgramConfig::getAutorestart( void ) const {
+AutoRestart ProgramConfig::getAutorestart( void ) const {
     return this->_autorestart;
 }
 
@@ -114,7 +114,7 @@ void ProgramConfig::setAutostart(bool autostart) {
     this->_autostart = autostart;
 }
 
-void ProgramConfig::setAutorestart(const std::string& autorestart) {
+void ProgramConfig::setAutorestart(AutoRestart& autorestart) {
     this->_autorestart = autorestart;
 }
 
@@ -148,4 +148,11 @@ void ProgramConfig::setStderrFile(const std::string& stderr_file) {
 
 void ProgramConfig::setEnv(const std::map<std::string, std::string>& env) {
     this->_env = env;
+}
+
+AutoRestart ProgramConfig::parseAutoRestart(const std::string& s) {
+    if (s == "never") return AutoRestart::NEVER;
+    if (s == "unexpected") return AutoRestart::UNEXPECTED;
+    if (s == "always") return AutoRestart::ALWAYS;
+    throw std::invalid_argument("Invalid autorestart value: " + s);
 }
