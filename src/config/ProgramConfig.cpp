@@ -1,5 +1,8 @@
 #include "ProgramConfig.hpp"
 
+
+////////// Constructors | Destructor ////////// 
+
 ProgramConfig::ProgramConfig( void ) = default;
 
 ProgramConfig::ProgramConfig(const YAML::Node& node) {
@@ -29,6 +32,9 @@ ProgramConfig::ProgramConfig(const YAML::Node& node) {
 }
 
 ProgramConfig::~ProgramConfig( void ) = default;
+
+
+////////// Getters ////////// 
 
 std::string ProgramConfig::getProgramName( void ) const {
     return  this->_program_name;
@@ -90,6 +96,9 @@ std::map<std::string, std::string> ProgramConfig::getEnv( void ) const {
     return this->_env;
 }
 
+
+////////// Setters ////////// 
+
 void ProgramConfig::setProgramName(const std::string& program_name) {
     this->_program_name = program_name;
 }
@@ -149,6 +158,9 @@ void ProgramConfig::setStderrFile(const std::string& stderr_file) {
 void ProgramConfig::setEnv(const std::map<std::string, std::string>& env) {
     this->_env = env;
 }
+
+
+////////// Functions ////////// 
 
 AutoRestart ProgramConfig::parseAutoRestart(const std::string& s) {
     if (s == "never") return AutoRestart::NEVER;

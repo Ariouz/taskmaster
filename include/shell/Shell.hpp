@@ -2,11 +2,14 @@
 
 #include <string>
 #include <readline/readline.h>
+#include <readline/history.h>
+#include <vector>
 
 class Shell {
 
     private:
-        std::string readline(std::string command);
+        char*                           _readline_return;
+        static std::vector<std::string> _commands;
 
     public:
         Shell();
@@ -18,5 +21,8 @@ class Shell {
         void stop(std::string name);
         void reload();
         void quit();
+
+        static char*   command_generator(const char* text, int state);
+        static char**  custom_completion(const char* text, int start, int end);
 
 };

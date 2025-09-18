@@ -35,21 +35,21 @@ class ProgramConfig {
         ProgramConfig( const YAML::Node& node );
         ~ProgramConfig( void );
         
-        std::string getProgramName( void ) const;
-        std::string getCmd( void ) const;
-        int getNumprocs( void ) const;
-        mode_t getUmask( void ) const;
-        std::string getWorkingdir( void ) const;
-        bool getAutostart( void ) const;
-        AutoRestart getAutorestart( void ) const;
-        std::vector<int> getExitcodes( void ) const;
-        int getStartretries( void ) const;
-        int getStarttime( void ) const;
-        std::string getStopsignal( void ) const;
-        int getStoptime( void ) const;
-        std::string getStdoutFile ( void ) const;
-        std::string getStderrFile( void ) const;
-        std::map<std::string, std::string> getEnv( void ) const;
+        std::string                         getProgramName( void ) const;
+        std::string                         getCmd( void ) const;
+        int                                 getNumprocs( void ) const;
+        mode_t                              getUmask( void ) const;
+        std::string                         getWorkingdir( void ) const;
+        bool                                getAutostart( void ) const;
+        AutoRestart                         getAutorestart( void ) const;
+        std::vector<int>                    getExitcodes( void ) const;
+        int                                 getStartretries( void ) const;
+        int                                 getStarttime( void ) const;
+        std::string                         getStopsignal( void ) const;
+        int                                 getStoptime( void ) const;
+        std::string                         getStdoutFile ( void ) const;
+        std::string                         getStderrFile( void ) const;
+        std::map<std::string, std::string>  getEnv( void ) const;
         
         void setProgramName(const std::string& program_name);
         void setCmd(const std::string& cmd);
