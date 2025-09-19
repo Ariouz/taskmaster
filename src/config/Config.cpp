@@ -1,6 +1,9 @@
 #include "Config.hpp"
 #include "Logger.hpp"
 
+
+////////// Constructors | Destructor ////////// 
+
 Config::Config( void ) = default;
 
 Config::Config(const std::string& filePath) : _filePath(filePath) {
@@ -9,6 +12,16 @@ Config::Config(const std::string& filePath) : _filePath(filePath) {
 }
 
 Config::~Config() = default;
+
+
+////////// Getters ////////// 
+
+std::map<std::string, ProgramConfig>    Config::getPrograms( void ) const {
+    return this->_programs;
+}
+
+
+////////// Functions ////////// 
 
 void    Config::load() {
     YAML::Node config = YAML::LoadFile(this->_filePath);

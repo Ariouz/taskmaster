@@ -16,6 +16,8 @@ class Config {
 		Config(const std::string& path);
 		~Config();
 
+        std::map<std::string, ProgramConfig>    getPrograms( void ) const;
+
 		void load();
 		void reload();
 
