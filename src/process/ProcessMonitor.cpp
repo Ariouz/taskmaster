@@ -5,7 +5,11 @@
 #include "SigUtils.hpp"
 
 void ProcessManager::monitor() {
-    for (auto& [pid, process] : _processes) {
+    std::lock_guard<std::mutex> lock(_mtx);
+    for (auto it = _processes.begin(); it != _processes.end();) {
+        int pid = it->first;
+        Process& process = it->second;
+
         int status;
         pid_t result = waitpid(pid, &status, WNOHANG);
 
@@ -38,14 +42,16 @@ void ProcessManager::monitor() {
 
             handleAutoRestart(process, sig, true);
         }
+
+        it = _processes.erase(it);
     }
 }
 
 void ProcessManager::handleAutoRestart(Process& process, int code, bool killedBySignal) {
     if (process.shouldRestart(code, killedBySignal)) {
-        Logger::info("Restarting " + process.getName() + ": " + std::to_string(process.getRetries()) + "/" + std::to_string(process.getConfig().getStartretries()));
         Process new_proc = createProcess(process.getConfig());
         new_proc.setRetries(process.getRetries() + 1);
+        Logger::info("Restarting " + process.getName() + ": " + std::to_string(process.getRetries()) + "/" + std::to_string(process.getConfig().getStartretries()));
 
         _processes[new_proc.getPid()] = new_proc;
     }

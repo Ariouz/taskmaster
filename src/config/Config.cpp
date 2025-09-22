@@ -31,7 +31,7 @@ void    Config::load() {
         std::string program_name = it->first.as<std::string>();
         YAML::Node node = it->second;
 
-        ProgramConfig progconf(node);
+        ProgramConfig progconf(program_name, node);
         this->_programs[program_name] = progconf;
     }
 

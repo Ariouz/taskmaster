@@ -1,40 +1,59 @@
 #include "ProcessManager.hpp"
-#include "unistd.h"
-#include "sys/wait.h"
 #include "Logger.hpp"
+#include <unistd.h>
+#include <sys/wait.h>
+#include <cstdlib>
+#include <map>
+#include <string>
+#include <vector>
+#include <cstring>
 
-ProcessManager::ProcessManager() = default;
+ProcessManager::ProcessManager(Config& config) : _config(config) {}
 ProcessManager::~ProcessManager() = default;
 
-///////////---  TEMP METHOD ---///////////
 void ProcessManager::init() {
-    ProgramConfig cfg;
-    cfg.setProgramName("Echo");
-    cfg.setCmd("echo test");
-    cfg.setAutostart(true);
-
-    if (!cfg.getAutostart()) return;
-
-    Process process = createProcess(cfg);
-    if (process.getPid() == -1) return;
-
-    this->_processes.emplace(process.getPid(), process);
+    for(const auto& [name, progConf] : _config.getPrograms()) {
+        if (!progConf.getAutostart()) continue;;
+        
+        for (int i = 0; i < progConf.getNumprocs(); i++) {
+            Process process = createProcess(progConf);
+            if (process.getPid() == -1) continue;
+            
+            std::lock_guard<std::mutex> lock(_mtx);
+            this->_processes.emplace(process.getPid(), process);
+        }
+    }
 }
 
 
 Process ProcessManager::createProcess(const ProgramConfig& cfg) {
     int pid = fork();
-
+    
     if (pid == -1) {
         Logger::error("Failed to fork process " + cfg.getProgramName());
         return Process(pid, Status::FATAL, cfg);
     }
-
+    
     if (pid == 0) { // child
-        execlp("sh", "sh", "-c", cfg.getCmd().c_str(), nullptr);
+        umask(cfg.getUmask());
+        redirectOutputs(cfg);
+        if (chdir(cfg.getWorkingdir().c_str()) == -1) {
+            std::cerr << "[ERROR] Failed to set working dir to " << cfg.getWorkingdir() << std::endl;
+            _exit(EXIT_FAILURE);
+        }
+        
+        // ENV
+        std::vector<char*> env = prepareEnv(cfg);
+        for (char **e = env.data(); *e != nullptr; ++e)
+            std::cerr << "[DEBUG] ENV: " << *e << std::endl;
+
+        // CMD
+        const char* cmd = strdup(cfg.getCmd().c_str());
+        char* const argv[] = {const_cast<char*>("/bin/sh"), const_cast<char*>("-c"), const_cast<char*>(cmd), nullptr};
+        execve("/bin/sh", argv, env.data());
         _exit(EXIT_FAILURE);
     }
-
+    
     else { // parent
         Logger::info("Started process " + cfg.getProgramName() + " with pid " + std::to_string(pid));
         Process process = Process(pid, Status::STARTING, cfg);
@@ -42,19 +61,60 @@ Process ProcessManager::createProcess(const ProgramConfig& cfg) {
     }
 }
 
-/*
-    std::string cmd;
-    int numprocs = 1;
-    bool autostart = false;
-    enum class AutoRestart { ALWAYS, NEVER, UNEXPECTED } autorestart;
-    std::vector<int> exitcodes;
-    int startretries = 3;
-    int starttime = 1;
-    std::string stopsignal = "TERM";
-    int stoptime = 10;
-    std::string stdout_file;
-    std::string stderr_file;
-    std::map<std::string, std::string> env;
-    std::string workingdir = ".";
-    mode_t umask = 022;
-*/
+extern char **environ;
+std::vector<char*> ProcessManager::prepareEnv(const ProgramConfig& cfg) {
+    std::vector<char*> env;
+    std::vector<std::string> env_strings;
+    for (char **e = environ; *e != nullptr; ++e)
+    env_strings.emplace_back(*e);
+    
+    for (auto& kv : cfg.getEnv()) {
+        bool found = false;
+        for (auto& s : env_strings) {
+            if (s.find(kv.first + "=") == 0) {
+                s = kv.first + "=" + kv.second;
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        env_strings.push_back(kv.first + "=" + kv.second);
+    }
+    
+    for (auto& s : env_strings)
+        env.push_back(strdup(s.c_str()));
+    env.push_back(nullptr);
+    return env;
+}
+
+
+void ProcessManager::redirectOutputs(const ProgramConfig& cfg) {
+    auto redirect = [](const std::string& path, int fd) {
+        int target = path.empty() ? open("/dev/null", O_WRONLY) 
+        : open(path.c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if (target != -1) {
+            dup2(target, fd);
+            close(target);
+        }
+    };
+    
+    redirect(cfg.getStdoutFile(), STDOUT_FILENO);
+    redirect(cfg.getStderrFile(), STDERR_FILENO);
+}
+
+
+void    ProcessManager::setConfig(const Config& config) {
+    _config = config;
+}
+
+std::mutex& ProcessManager::getMutex() {
+    return _mtx;
+}
+
+Config& ProcessManager::getConfig() const {
+    return _config;
+}
+
+std::map<int, Process>& ProcessManager::getProcesses() {
+    return _processes;
+}

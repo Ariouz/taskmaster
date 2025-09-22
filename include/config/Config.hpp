@@ -20,9 +20,4 @@ class Config {
 
 		void load();
 		void reload();
-
-		const ProgramConfig& getProgram(const std::string& name) const;
-		const std::map<std::string, ProgramConfig>& getAllPrograms() const;
-
-		bool hasProgram(const std::string& name) const;
 };

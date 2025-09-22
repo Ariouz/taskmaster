@@ -1,15 +1,21 @@
 #pragma once
 
 #include <map>
+#include <mutex>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "Process.hpp"
-#include "ProgramConfig.hpp"
+#include "Config.hpp"
 
 class ProcessManager {
     private:
-        std::map<int, Process> _processes;
+        Config&                 _config;
+        std::map<int, Process>  _processes;
+        std::mutex              _mtx;
 
     public:
-        ProcessManager();
+        ProcessManager(Config& config);
         ~ProcessManager();
 
         // temp methods
@@ -23,5 +29,14 @@ class ProcessManager {
         void stop(std::string name);
         void restart(std::string name);
         void handleSigchld(int sig);
+
+        void                redirectOutputs(const ProgramConfig& cfg);
+        std::vector<char*>  prepareEnv(const ProgramConfig& cfg);
+
+        void                    setConfig(const Config& config);
+        
+        std::mutex&             getMutex();
+        Config&                 getConfig() const;
+        std::map<int, Process>& getProcesses();
 
 };

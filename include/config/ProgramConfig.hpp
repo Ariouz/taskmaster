@@ -32,7 +32,7 @@ class ProgramConfig {
     
     public:
         ProgramConfig( void );
-        ProgramConfig( const YAML::Node& node );
+        ProgramConfig( const std::string& name, const YAML::Node& node );
         ~ProgramConfig( void );
         
         std::string                         getProgramName( void ) const;

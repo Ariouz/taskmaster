@@ -2,8 +2,8 @@
 [] - Lecture config et init
 
 Gestion process:
-[] - Boucle processes => umask(int) + fork + chdir(workdir config) + setenv
-[] - dup2 des stderr/out ou /dev/null si non spécifiés
+[X] - Boucle processes => umask(int) + fork + chdir(workdir config) + setenv
+[X] - dup2 des stderr/out ou /dev/null si non spécifiés
 [X] - check si le binaire de la cmd existe => execve
 [X] - parent => stocker pid, start, status => process
 
@@ -20,11 +20,10 @@ Signaux:
 
 Gestion des logs:
 [OK] => Logger (global)
-[] => Redirection des sorties std vers fd pour les process => dup2 + fichier (def dans config)
+[X] => Redirection des sorties std vers fd pour les process => dup2 + fichier (def dans config)
 [] - Shell interactif => lib readline => status de process, start/stop/restart, reload, quit 
-  
+
 BONUS:
-[] => Shell: tab completion, history
 [] => Logging http/mail
 [] => Shell/Server séparés
 [] => Attach/detach

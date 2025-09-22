@@ -1,34 +1,77 @@
 programs:
-    nginx:
-        cmd: "/usr/local/bin/nginx -c /etc/nginx/test.conf"
-        numprocs: 1
-        umask: 022
-        workingdir: /tmp
-        autostart: true
-        autorestart: unexpected
-        exitcodes:
-            - 0
-            - 2
-        startretries: 3
-        starttime: 5
-        stopsignal: TERM
-        stoptime: 10
-        stdout: /tmp/nginx.stdout
-        stderr: /tmp/nginx.stderr
-        env:
-            STARTED_BY: taskmaster
-            ANSWER: 42
-    vogsphere:
-        cmd: "/usr/local/bin/vogsphere-worker --no-prefork"
-        numprocs: 8
-        umask: 077
-        workingdir: /tmp
-        autostart: true
-        autorestart: unexpected
-        exitcodes: 0
-        startretries: 3
-        starttime: 5
-        stopsignal: USR1
-        stoptime: 10
-        stdout: /tmp/vgsworker.stdout
-        stderr: /tmp/vgsworker.stderr
+  sleeper:
+    cmd: "sleep 10"
+    numprocs: 2
+    umask: 022
+    workingdir: .
+    autostart: true
+    exitcodes: [0]
+    startretries: 2
+    starttime: 1
+    autorestart: unexpected
+    stopsignal: TERM
+    stoptime: 5
+    stdout: /tmp/sleeper.stdout
+    stderr: /tmp/sleeper.stderr
+
+  counter:
+    cmd: "bash -c 'for i in {1..5}; do echo Count $i; sleep 1; done'"
+    numprocs: 1
+    umask: 022
+    workingdir: .
+    autostart: true
+    exitcodes: [0]
+    startretries: 1
+    starttime: 1
+    autorestart: unexpected
+    stopsignal: TERM
+    stoptime: 5
+    stdout: /tmp/counter.stdout
+    stderr: /tmp/counter.stderr
+
+  spam:
+    cmd: "yes 'spam' | head -n 20"
+    numprocs: 1
+    umask: 022
+    workingdir: .
+    autostart: false
+    exitcodes: [0]
+    startretries: 1
+    starttime: 1
+    autorestart: never
+    stopsignal: TERM
+    stoptime: 5
+    stdout: /dev/null
+    stderr: /dev/null
+
+  env_test:
+    cmd: "echo $TASKMASTER"
+    numprocs: 1
+    umask: 022
+    workingdir: .
+    autostart: true
+    exitcodes: [0]
+    startretries: 1
+    starttime: 1
+    autorestart: never
+    stopsignal: TERM
+    stoptime: 5
+    stdout: /tmp/env_test.stdout
+    stderr: /tmp/env_test.stderr
+    env:
+      TASKMASTER: "This is taskmaster"
+
+  failing_process:
+    cmd: "sh -c 'exit 1'"
+    numprocs: 1
+    umask: 022
+    workingdir: .
+    autostart: true
+    exitcodes: [0]
+    startretries: 3
+    starttime: 1
+    autorestart: always
+    stopsignal: TERM
+    stoptime: 5
+    stdout: /tmp/failing_process.stdout
+    stderr: /tmp/failing_process.stderr

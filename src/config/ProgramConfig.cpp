@@ -5,8 +5,8 @@
 
 ProgramConfig::ProgramConfig( void ) = default;
 
-ProgramConfig::ProgramConfig(const YAML::Node& node) {
-    
+ProgramConfig::ProgramConfig(const std::string& name, const YAML::Node& node) {
+    this->_program_name = name;
     this->_cmd = node["cmd"].as<std::string>();
     this->_numprocs = node["numprocs"].as<int>();
     this->_umask = node["umask"].as<mode_t>();
