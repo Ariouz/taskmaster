@@ -10,7 +10,8 @@
 #include <sstream>
 #include <mutex>
 #include "ProcessManager.hpp"
-
+#include "Logger.hpp"
+#include "Status.hpp"
 
 class Shell {
 
@@ -26,14 +27,15 @@ class Shell {
         Shell(ProcessManager* pm);
         ~Shell();
 
-        static char*    command_generator( const char* text, int state );
-        static char**   custom_completion( const char* text, int start, int end );
-        void            functionsCall( const std::string readline_return ) const;
-        void            run( const std::string& arg );
-        void            status( void );
-        void            start( const std::string& arg );
-        void            stop( const std::string& arg );
-        void            reload( void );
-        void            quit( void );
+        static char*                command_generator( const char* text, int state );
+        static char**               custom_completion( const char* text, int start, int end );
+        std::vector<std::string>    split_multi_delim(const std::string& str, const std::string& delimiters);
+        void                        functionsCall( const std::string readline_return ) const;
+        void                        run( const std::string& arg );
+        void                        status( const std::string& arg );
+        void                        start( const std::string& arg );
+        void                        stop( const std::string& arg );
+        void                        reload( void );
+        void                        quit( void );
 
 };

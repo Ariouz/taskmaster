@@ -14,11 +14,11 @@ ProcessManager::~ProcessManager() = default;
 void ProcessManager::init() {
     for(const auto& [name, progConf] : _config.getPrograms()) {
         if (!progConf.getAutostart()) continue;;
-        
+
         for (int i = 0; i < progConf.getNumprocs(); i++) {
             Process process = createProcess(progConf);
             if (process.getPid() == -1) continue;
-            
+
             std::lock_guard<std::mutex> lock(_mtx);
             this->_processes.emplace(process.getPid(), process);
         }
@@ -43,12 +43,12 @@ std::vector<char*> splitCommand(const std::string& cmd) {
 
 Process ProcessManager::createProcess(const ProgramConfig& cfg) {
     int pid = fork();
-    
+
     if (pid == -1) {
         Logger::error("Failed to fork process " + cfg.getProgramName());
         return Process(pid, Status::FATAL, cfg);
     }
-    
+
     if (pid == 0) { // child
         umask(cfg.getUmask());
         redirectOutputs(cfg);
@@ -56,7 +56,7 @@ Process ProcessManager::createProcess(const ProgramConfig& cfg) {
             std::cerr << "[ERROR] Failed to set working dir to " << cfg.getWorkingdir() << std::endl;
             _exit(EXIT_FAILURE);
         }
-        
+
         // ENV
         std::vector<char*> env = prepareEnv(cfg);
         for (char **e = env.data(); *e != nullptr; ++e)
@@ -74,7 +74,7 @@ Process ProcessManager::createProcess(const ProgramConfig& cfg) {
         // NEVER REACHED
         return Process(-1, Status::FATAL, cfg);
     }
-    
+
     else { // parent
         Logger::info("Started process " + cfg.getProgramName() + " with pid " + std::to_string(pid));
         Process process = Process(pid, Status::STARTING, cfg);

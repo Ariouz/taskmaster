@@ -11,7 +11,7 @@ std::map<std::string, std::function<void(const std::string& arg)>> Shell::_comma
 Shell::Shell(ProcessManager* pm) : _pm(pm) {
     _commands_functions = {
         // { "run",    [this](const std::string& arg) { run(); } },
-        { "status", [this](const std::string& arg) { (void) arg; status(); } },
+        { "status", [this](const std::string& arg) { status(arg); } },
         { "start",  [this](const std::string& arg) { start(arg); } },
         { "stop",   [this](const std::string& arg) { stop(arg); } },
         { "reload", [this](const std::string& arg) { (void) arg; reload(); } },
@@ -89,29 +89,65 @@ void Shell::functionsCall( const std::string readline_return ) const {
         }
 }
 
+std::vector<std::string> Shell::split_multi_delim(const std::string& str, const std::string& delimiters) {
+    std::vector<std::string> tokens;
+    std::string current;
+
+    for (char ch : str) {
+        if (delimiters.find(ch) != std::string::npos) {
+            if (!current.empty()) {
+                tokens.push_back(current);
+                current.clear();
+            }
+        } else {
+            current += ch;
+        }
+    }
+
+    if (!current.empty())
+        tokens.push_back(current);
+
+    return tokens;
+}
+
 // void    Shell::run( void ) {
 //     std::cout << "run" << std::endl;
 // }
 
-void    Shell::status() {
-    std::cout << "status" << std::endl;
+void    Shell::status( const std::string& arg ) {
+
     std::lock_guard<std::mutex> lock(_pm->getMutex());
-    for (auto& kv : _pm->getConfig().getPrograms()) {
-        const ProgramConfig& cfg = kv.second;
+
+    std::vector<std::string> args;
+
+    if (arg.empty()) {
+        for (auto& program : _pm->getConfig().getPrograms())
+            args.push_back(program.second.getProgramName());
+    } else {
+        args = split_multi_delim(arg, " \t");
+    }
+
+    for (auto& program : args) {
         int count = 0;
+
         for (auto& [pid, proc] : _pm->getProcesses()) {
-            if (proc.getName() == cfg.getProgramName()) {
-                std::cout << cfg.getProgramName()
+            if (proc.getName() == program) {
+                std::cout << proc.getName()
                 << "[" << count << "]: pid=" << proc.getPid()
-                << " status=" << StatusUtils::toString(proc.getStatus())
-                << std::endl;
+                << " status=" << StatusUtils::toString(proc.getStatus());
+
+                if (proc.getStatus() == Status::RUNNING)
+                    std::cout << " uptime=" << proc.uptimeStr();
+
+                std::cout << std::endl;
+
                 count++;
             }
         }
-        
-        for (; count < cfg.getNumprocs(); ++count) {
-            std::cout << cfg.getProgramName()
-            << "[" << count << "]: not running"
+
+        for (; count < _pm->getConfig().getPrograms()[program].getNumprocs(); ++count) {
+            std::cout << program
+            << ": ERROR (no such process)"
             << std::endl;
         }
     }

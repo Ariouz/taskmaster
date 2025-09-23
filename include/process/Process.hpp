@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <ctime>
 #include "ProgramConfig.hpp"
+#include <iomanip>
 
 class Process {
 
@@ -34,4 +35,5 @@ class Process {
         void              setRetries(int retries);
 
         bool              shouldRestart(int exitCode, bool killedBySignal) const;
+        std::string       uptimeStr( void ) const;
 };
