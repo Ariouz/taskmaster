@@ -1,5 +1,6 @@
 #include "Shell.hpp"
 #include "Logger.hpp"
+#include "StatusUtils.hpp"
 
 std::vector<std::string> Shell::_commands = { "run", "status", "start", "stop", "reload", "quit" };
 std::map<std::string, std::function<void(const std::string& arg)>> Shell::_commands_functions;
@@ -95,6 +96,26 @@ void Shell::functionsCall( const std::string readline_return ) const {
 void    Shell::status() {
     std::cout << "status" << std::endl;
     std::lock_guard<std::mutex> lock(_pm->getMutex());
+    for (auto& kv : _pm->getConfig().getPrograms()) {
+        const ProgramConfig& cfg = kv.second;
+        int count = 0;
+        for (auto& [pid, proc] : _pm->getProcesses()) {
+            if (proc.getName() == cfg.getProgramName()) {
+                std::cout << cfg.getProgramName()
+                << "[" << count << "]: pid=" << proc.getPid()
+                << " status=" << StatusUtils::toString(proc.getStatus())
+                << std::endl;
+                count++;
+            }
+        }
+        
+        for (; count < cfg.getNumprocs(); ++count) {
+            std::cout << cfg.getProgramName()
+            << "[" << count << "]: not running"
+            << std::endl;
+        }
+    }
+    
 }
 
 void    Shell::start( const std::string& arg ) {

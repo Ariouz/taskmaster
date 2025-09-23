@@ -10,6 +10,14 @@ void ProcessManager::monitor() {
         int pid = it->first;
         Process& process = it->second;
 
+        if (process.getStatus() == Status::EXITED
+            || process.getStatus() == Status::FATAL
+            ||process.getStatus() == Status::STOPPED) {
+            
+            it++;
+            continue;
+        }
+
         int status;
         pid_t result = waitpid(pid, &status, WNOHANG);
 
@@ -17,10 +25,13 @@ void ProcessManager::monitor() {
             time_t now = std::time(NULL);
             time_t diff = now - process.getStartTime();
             if (process.getStatus() == Status::STARTING && diff >= process.getConfig().getStarttime()) process.setStatus(Status::RUNNING);
+            it++;
+            continue;
         }
 
         if (result == -1) {
             Logger::error("Error while waiting for pid " + std::to_string(pid));
+            it++;
             continue;
         }
 
@@ -43,7 +54,7 @@ void ProcessManager::monitor() {
             handleAutoRestart(process, sig, true);
         }
 
-        it = _processes.erase(it);
+        //it = _processes.erase(it);
     }
 }
 

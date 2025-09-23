@@ -8,7 +8,7 @@ Gestion process:
 [X] - parent => stocker pid, start, status => process
 
 Boucle monitoring (Thread séparé while + sleep):
-    [DOING] - waitpid(pid, &status, WNOHAND) => detection process mort + log => > 0 = mort: WIFEXITED, WEXITSTATUS (comparer avec exit_codes), WIFSIGNALED
+    [X] - waitpid(pid, &status, WNOHAND) => detection process mort + log => > 0 = mort: WIFEXITED, WEXITSTATUS (comparer avec exit_codes), WIFSIGNALED
     [DOING] - check si time-start_time > X secondes => status Started
     [DOING] - Maj status process + log
     Autorestart:

@@ -25,6 +25,21 @@ void ProcessManager::init() {
     }
 }
 
+std::vector<char*> splitCommand(const std::string& cmd) {
+    std::istringstream iss(cmd);
+    std::vector<std::string> parts;
+    std::string token;
+    while (iss >> token) {
+        parts.push_back(token);
+    }
+
+    std::vector<char*> argv;
+    for (auto& p : parts)
+        argv.push_back(const_cast<char*>(p.c_str()));
+    argv.push_back(nullptr);
+    return argv;
+}
+
 
 Process ProcessManager::createProcess(const ProgramConfig& cfg) {
     int pid = fork();
@@ -48,10 +63,16 @@ Process ProcessManager::createProcess(const ProgramConfig& cfg) {
             std::cerr << "[DEBUG] ENV: " << *e << std::endl;
 
         // CMD
-        const char* cmd = strdup(cfg.getCmd().c_str());
-        char* const argv[] = {const_cast<char*>("/bin/sh"), const_cast<char*>("-c"), const_cast<char*>(cmd), nullptr};
-        execve("/bin/sh", argv, env.data());
-        _exit(EXIT_FAILURE);
+        std::vector<char*> argv = splitCommand(cfg.getCmd());
+        std::cerr << "[DEBUG] execvpe " << argv[0] << std::endl;
+
+        if (execvpe(argv[0], argv.data(), env.data()) == -1) {
+            perror("execvpe failed");
+             _exit(EXIT_FAILURE);
+        }
+
+        // NEVER REACHED
+        return Process(-1, Status::FATAL, cfg);
     }
     
     else { // parent
