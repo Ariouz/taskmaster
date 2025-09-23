@@ -9,11 +9,11 @@ Gestion process:
 
 Boucle monitoring (Thread séparé while + sleep):
     [X] - waitpid(pid, &status, WNOHAND) => detection process mort + log => > 0 = mort: WIFEXITED, WEXITSTATUS (comparer avec exit_codes), WIFSIGNALED
-    [DOING] - check si time-start_time > X secondes => status Started
-    [DOING] - Maj status process + log
+    [X] - check si time-start_time > X secondes => status Started
+    [X] - Maj status process + log
     Autorestart:
-        [DOING] - check autorestart pour le process fail
-        [DOING] - Retry jusqu'au max_retries + log
+        [X] - check autorestart pour le process fail
+        [X] - Retry jusqu'au max_retries + log
 
 Signaux:
 [] - Gestion sig SIGHUB (reload config), SIGCHLD (fin de process), SIGINT/SIGTERM (clean exit)
