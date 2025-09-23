@@ -9,8 +9,12 @@ Logger::Logger(const std::string& logfile) : _logfile(logfile) {
 }
 Logger::~Logger() = default;
 
+void Logger::setVerbose(bool verbose) {
+    instance()._verbose = verbose;
+}
+
 void Logger::info(const std::string& msg) { 
-    instance()._log("[INFO] ", msg); 
+    instance()._log(COLOR_INFO"[INFO] ", COLOR_RESET+msg); 
     #ifdef BONUS
     openlog("taskmaster", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_INFO, "%s", msg.c_str());
@@ -19,7 +23,7 @@ void Logger::info(const std::string& msg) {
 }
 
 void Logger::warn(const std::string& msg) { 
-    instance()._log("[WARN] ", msg); 
+    instance()._log(COLOR_WARN"[WARN] ", COLOR_RESET+msg); 
     #ifdef BONUS
     openlog("taskmaster", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_WARNING, "%s", msg.c_str());
@@ -28,7 +32,7 @@ void Logger::warn(const std::string& msg) {
 }
 
 void Logger::error(const std::string& msg) { 
-    instance()._log("[ERROR] ", msg);
+    instance()._log(COLOR_ERROR"[ERROR] ", COLOR_RESET+msg);
     #ifdef BONUS
     openlog("taskmaster", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_ERR, "%s", msg.c_str());

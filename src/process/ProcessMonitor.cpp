@@ -37,24 +37,33 @@ void ProcessManager::monitor() {
 
         if (WIFEXITED(status)) {
             int code = WEXITSTATUS(status);
-            Logger::info("Process " + process.getName() + " exited with code " + std::to_string(code));
 
-            if (ExitUtils::isExpectedExit(process, code)) process.setStatus(Status::EXITED);
-            else process.setStatus(Status::FATAL);
+            if (ExitUtils::isExpectedExit(process, code)) {
+                process.setStatus(Status::EXITED); 
+                Logger::info("Process " + process.getName() + " exited with code " + std::to_string(code));
+            }
+            else {
+                process.setStatus(Status::FATAL); 
+                Logger::warn("Process " + process.getName() + " exited with unexpected code " + std::to_string(code));
+            }
 
             handleAutoRestart(process, code);
         }
         else if (WIFSIGNALED(status)) {
             int sig = WTERMSIG(status);
-            Logger::warn("Process " + process.getName() + " killed by signal " + std::to_string(sig));
-
-            if (SigUtils::isStopSignal(process, sig)) process.setStatus(Status::STOPPED);
-            else process.setStatus(Status::FATAL);
-
-            handleAutoRestart(process, sig, true);
+            
+            if (SigUtils::isStopSignal(process, sig)) {
+                process.setStatus(Status::STOPPED);
+                Logger::info("Process " + process.getName() + " killed by signal " + std::to_string(sig));
+                // No restart if stopped using stop command
+            }
+            else {
+                process.setStatus(Status::FATAL);
+                Logger::warn("Process " + process.getName() + " killed by unexpected signal " + std::to_string(sig));
+                handleAutoRestart(process, sig, true);
+            }
         }
 
-        //it = _processes.erase(it);
     }
 }
 
@@ -62,7 +71,7 @@ void ProcessManager::handleAutoRestart(Process& process, int code, bool killedBy
     if (process.shouldRestart(code, killedBySignal)) {
         Process new_proc = createProcess(process.getConfig());
         new_proc.setRetries(process.getRetries() + 1);
-        Logger::info("Restarting " + process.getName() + ": " + std::to_string(process.getRetries()) + "/" + std::to_string(process.getConfig().getStartretries()));
+        Logger::info("Restarting " + new_proc.getName() + ": " + std::to_string(new_proc.getRetries()) + "/" + std::to_string(new_proc.getConfig().getStartretries()));
 
         _processes[new_proc.getPid()] = new_proc;
     }

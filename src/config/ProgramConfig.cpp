@@ -16,6 +16,8 @@ ProgramConfig::ProgramConfig(const std::string& name, const YAML::Node& node) {
     if (node["exitcodes"]) {
         if (node["exitcodes"].IsSequence()) {
             this->_exitcodes = node["exitcodes"].as<std::vector<int>>();
+        } else if (node["exitcodes"].IsScalar()) {
+            this->_exitcodes = { node["exitcodes"].as<int>() };
         } else {
             this->_exitcodes = { node["exitcodes"].as<int>() };
         }

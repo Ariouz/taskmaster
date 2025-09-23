@@ -19,11 +19,13 @@ Signaux:
 [] - Gestion sig SIGHUB (reload config), SIGCHLD (fin de process), SIGINT/SIGTERM (clean exit)
 
 Gestion des logs:
-[OK] => Logger (global)
+[X] => Logger (global)
 [X] => Redirection des sorties std vers fd pour les process => dup2 + fichier (def dans config)
 [] - Shell interactif => lib readline => status de process, start/stop/restart, reload, quit 
 
 BONUS:
-[] => Logging http/mail
+[X] => Logging syslog
 [] => Shell/Server séparés
 [] => Attach/detach
+[X] => Colorized logs, status
+[X] => Commande logs pour attacher les logs: verbose true, pas de readline, ctrl+c pour quitter le logs et retourner au shell, ctrl+c again = rien
