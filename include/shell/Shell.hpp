@@ -37,7 +37,10 @@ class Shell {
         void            stop( const std::string& arg );
         void            reload( void );
         void            quit( void );
+
+        #ifdef BONUS
         void            logs( void );
+        #endif
 
 
 };
