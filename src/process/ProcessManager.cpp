@@ -50,6 +50,7 @@ Process ProcessManager::createProcess(const ProgramConfig& cfg) {
     }
     
     if (pid == 0) { // child
+        setpgid(0, 0);
         umask(cfg.getUmask());
         redirectOutputs(cfg);
         if (chdir(cfg.getWorkingdir().c_str()) == -1) {

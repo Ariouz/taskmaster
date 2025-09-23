@@ -1,8 +1,9 @@
 #include "Shell.hpp"
 #include "Logger.hpp"
 #include "StatusUtils.hpp"
+#include <thread>
 
-std::vector<std::string> Shell::_commands = { "run", "status", "start", "stop", "reload", "quit" };
+std::vector<std::string> Shell::_commands = { "run", "status", "start", "stop", "reload", "quit", "logs" };
 std::map<std::string, std::function<void(const std::string& arg)>> Shell::_commands_functions;
 
 
@@ -15,7 +16,8 @@ Shell::Shell(ProcessManager* pm) : _pm(pm) {
         { "start",  [this](const std::string& arg) { start(arg); } },
         { "stop",   [this](const std::string& arg) { stop(arg); } },
         { "reload", [this](const std::string& arg) { (void) arg; reload(); } },
-        { "quit",   [this](const std::string& arg) { (void) arg; quit(); } }
+        { "quit",   [this](const std::string& arg) { (void) arg; quit(); } },
+        { "logs",   [this](const std::string& arg) { (void) arg; logs(); } }
     };
 
     rl_attempted_completion_function = &Shell::custom_completion;
@@ -163,4 +165,12 @@ void    Shell::quit() {
     std::cout << "quit" << std::endl;
     std::lock_guard<std::mutex> lock(_pm->getMutex());
     // stop processes + exit
+}
+
+void    Shell::logs() {
+    logs_mode_flag.store(true);
+    Logger::setVerbose(true);
+    while (logs_mode_flag.load())
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    Logger::setVerbose(false);
 }

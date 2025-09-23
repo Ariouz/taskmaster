@@ -3,5 +3,7 @@
 #include <algorithm>
 
 bool ExitUtils::isExpectedExit(const Process& process, int exitCode) {
-    return std::find(process.getConfig().getExitcodes().begin(), process.getConfig().getExitcodes().end(), exitCode) != process.getConfig().getExitcodes().end();
+    const auto& exits = process.getConfig().getExitcodes();
+    return std::find(exits.begin(), exits.end(), exitCode) != exits.end();
 }
+

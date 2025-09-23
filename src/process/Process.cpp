@@ -45,6 +45,7 @@ bool  Process::shouldRestart(int exitCode, bool killedBySignal = false) const {
     if (this->_config.getAutorestart() == AutoRestart::NEVER) return false;
     if (this->_retries >= this->_config.getStartretries()) return false;
 
+
     if (this->_config.getAutorestart() == AutoRestart::UNEXPECTED) {
 
         if (killedBySignal && SigUtils::isStopSignal(*this, exitCode)) return false;

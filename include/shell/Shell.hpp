@@ -10,7 +10,9 @@
 #include <sstream>
 #include <mutex>
 #include "ProcessManager.hpp"
+#include <atomic>
 
+extern std::atomic<bool> logs_mode_flag;
 
 class Shell {
 
@@ -35,5 +37,7 @@ class Shell {
         void            stop( const std::string& arg );
         void            reload( void );
         void            quit( void );
+        void            logs( void );
+
 
 };

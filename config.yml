@@ -6,9 +6,9 @@ programs:
     workingdir: .
     autostart: true
     exitcodes: [0]
-    startretries: 2
+    startretries: 5
     starttime: 1
-    autorestart: unexpected
+    autorestart: always
     stopsignal: TERM
     stoptime: 5
     stdout: /tmp/sleeper.stdout
