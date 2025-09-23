@@ -5,6 +5,11 @@
 #include <sstream>
 #include <iostream>
 
+#ifdef BONUS
+// Get syslogs: journalctl -f -t taskmaster
+# include <syslog.h>
+#endif
+
 class Logger {
 
     private:

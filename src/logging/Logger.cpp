@@ -9,9 +9,32 @@ Logger::Logger(const std::string& logfile) : _logfile(logfile) {
 }
 Logger::~Logger() = default;
 
-void Logger::info(const std::string& msg) { instance()._log("[INFO] ", msg); }
-void Logger::warn(const std::string& msg) { instance()._log("[WARN] ", msg); }
-void Logger::error(const std::string& msg) { instance()._log("[ERROR] ", msg); }
+void Logger::info(const std::string& msg) { 
+    instance()._log("[INFO] ", msg); 
+    #ifdef BONUS
+    openlog("taskmaster", LOG_PID | LOG_CONS, LOG_USER);
+    syslog(LOG_INFO, "%s", msg.c_str());
+    closelog();
+    #endif
+}
+
+void Logger::warn(const std::string& msg) { 
+    instance()._log("[WARN] ", msg); 
+    #ifdef BONUS
+    openlog("taskmaster", LOG_PID | LOG_CONS, LOG_USER);
+    syslog(LOG_WARNING, "%s", msg.c_str());
+    closelog();
+    #endif
+}
+
+void Logger::error(const std::string& msg) { 
+    instance()._log("[ERROR] ", msg);
+    #ifdef BONUS
+    openlog("taskmaster", LOG_PID | LOG_CONS, LOG_USER);
+    syslog(LOG_ERR, "%s", msg.c_str());
+    closelog();
+    #endif
+}
 
 
 void Logger::_log(const std::string& level, const std::string& msg) {

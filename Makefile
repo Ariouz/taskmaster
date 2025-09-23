@@ -1,7 +1,7 @@
 #################### VARIABLES
 NAME = taskmaster
 CXX = g++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -g
+CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -g $(if $(BONUS),-DBONUS)
 LDFLAGS = -lreadline -lyaml-cpp
 
 SRC_DIR = src
@@ -27,6 +27,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
+
+bonus:
+	make $(NAME) BONUS=1
 
 clean:
 	rm -rf $(OBJ_DIR)
