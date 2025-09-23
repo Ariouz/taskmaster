@@ -5,7 +5,6 @@
 #include <thread>
 #include <csignal>
 
-Taskmaster* Taskmaster::_instance = nullptr;
 std::atomic<bool>       logs_mode_flag {false};
 
 
@@ -17,7 +16,6 @@ void Taskmaster::sigHandler(int sig) {
 }
 
 Taskmaster::Taskmaster(const std::string& configFile) {
-    _instance = this;
     FileChecker::checkFile(configFile);
     this->_config = Config(configFile);
     Logger::info("Loaded taskmaster with config file " + configFile);

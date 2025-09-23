@@ -14,7 +14,6 @@ class Taskmaster {
         Shell                           _shell;
         std::string                     _configFile;
 
-        static Taskmaster*              _instance;
         static void                     sigHandler(int sig);
 
     public:
