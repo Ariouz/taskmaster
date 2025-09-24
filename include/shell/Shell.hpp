@@ -10,21 +10,20 @@
 #include <sstream>
 #include <mutex>
 #include "ProcessManager.hpp"
-<<<<<<< HEAD
 #include <atomic>
-
-extern std::atomic<bool> logs_mode_flag;
-=======
 #include "Logger.hpp"
 #include "Status.hpp"
->>>>>>> refs/remotes/origin/main
+
+extern std::atomic<bool> logs_mode_flag;
 
 class Shell {
 
     private:
-        char*                                               _readline_return;
-        static std::vector<std::string>                     _commands;
-        static std::map<std::string, std::function<void(const std::string& arg)>> _commands_functions;
+        char*                                                                       _readline_return;
+        static std::vector<std::string>                                             _commands;
+        static std::vector<std::string>                                             _programs_list;
+        static const std::vector<std::string>*                                      _current_completion_list;
+        static std::map<std::string, std::function<void(const std::string& arg)>>   _commands_functions;
 
         ProcessManager*                                     _pm;
 
@@ -37,6 +36,10 @@ class Shell {
         static char**               custom_completion( const char* text, int start, int end );
         std::vector<std::string>    split_multi_delim(const std::string& str, const std::string& delimiters);
         void                        functionsCall( const std::string readline_return ) const;
+        void                        init_commands_functions_map( void );
+        void                        init_programs_list_vector( void );
+        void                        readline_util( void );
+
         void                        run( const std::string& arg );
         void                        status( const std::string& arg );
         void                        start( const std::string& arg );

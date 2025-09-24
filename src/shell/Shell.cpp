@@ -8,38 +8,22 @@ std::vector<std::string> Shell::_commands = { "run", "status", "start", "stop", 
         "logs"
     #endif 
 };
+
+std::vector<std::string> Shell::_programs_list;
+const std::vector<std::string>* Shell::_current_completion_list = &Shell::_commands;
 std::map<std::string, std::function<void(const std::string& arg)>> Shell::_commands_functions;
 
 
 ////////// Constructors | Destructor ////////// 
 
 Shell::Shell(ProcessManager* pm) : _pm(pm) {
-    _commands_functions = {
-        // { "run",    [this](const std::string& arg) { run(); } },
-        { "status", [this](const std::string& arg) { status(arg); } },
-        { "start",  [this](const std::string& arg) { start(arg); } },
-        { "stop",   [this](const std::string& arg) { stop(arg); } },
-        { "reload", [this](const std::string& arg) { (void) arg; reload(); } },
-        { "quit",   [this](const std::string& arg) { (void) arg; quit(); } }
-        #ifdef BONUS
-        ,{ "logs",   [this](const std::string& arg) { (void) arg; logs(); } }
-        #endif
-    };
+    this->init_commands_functions_map();
+
+    this->init_programs_list_vector();
 
     rl_attempted_completion_function = &Shell::custom_completion;
 
-    while ((this->_readline_return = readline("\033[38;5;154mtaskmaster> \033[0m"))) {
-        if (this->_readline_return && *this->_readline_return)
-            add_history(this->_readline_return);
-
-        if (this->_readline_return) {
-            std::string command = this->_readline_return;
-
-            this->functionsCall(command);
-
-            free(this->_readline_return);
-        }
-    }
+    this->readline_util();
 }
 
 Shell::~Shell() = default;
@@ -56,8 +40,8 @@ char* Shell::command_generator(const char* text, int state) {
         len = strlen(text);
     }
 
-    while (list_index < Shell::_commands.size()) {
-        const std::string& cmd = Shell::_commands[list_index++];
+    while (list_index < _current_completion_list->size()) {
+        const std::string& cmd = (*_current_completion_list)[list_index++];
         if (cmd.compare(0, len, text) == 0)
             return strdup(cmd.c_str());
     }
@@ -71,7 +55,45 @@ char** Shell::custom_completion(const char* text, int start, int end) {
 
     rl_attempted_completion_over = 1;
 
+    std::string line(rl_line_buffer);
+    line.erase(0, line.find_first_not_of(" \t"));
+
+    std::istringstream iss(line);
+    std::string first_word;
+    iss >> first_word;
+
+    static const std::set<std::string> commands_with_args = {
+        "run", "start", "stop", "reload", "status"
+    };
+
+    if (commands_with_args.count(first_word) && line.size() > first_word.size() && std::isspace(line[first_word.size()])) {
+        _current_completion_list = &_programs_list;
+    } else {
+        _current_completion_list = &_commands;
+    }
+
     return rl_completion_matches(text, &Shell::command_generator);
+}
+
+std::vector<std::string> Shell::split_multi_delim(const std::string& str, const std::string& delimiters) {
+    std::vector<std::string> tokens;
+    std::string current;
+
+    for (char ch : str) {
+        if (delimiters.find(ch) != std::string::npos) {
+            if (!current.empty()) {
+                tokens.push_back(current);
+                current.clear();
+            }
+        } else {
+            current += ch;
+        }
+    }
+
+    if (!current.empty())
+        tokens.push_back(current);
+
+    return tokens;
 }
 
 void Shell::functionsCall( const std::string readline_return ) const {
@@ -97,25 +119,40 @@ void Shell::functionsCall( const std::string readline_return ) const {
         }
 }
 
-std::vector<std::string> Shell::split_multi_delim(const std::string& str, const std::string& delimiters) {
-    std::vector<std::string> tokens;
-    std::string current;
+void    Shell::init_commands_functions_map( void ) {
+    this->_commands_functions = {
+        // { "run",    [this](const std::string& arg) { run(); } },
+        { "status", [this](const std::string& arg) { status(arg); } },
+        { "start",  [this](const std::string& arg) { start(arg); } },
+        { "stop",   [this](const std::string& arg) { stop(arg); } },
+        { "reload", [this](const std::string& arg) { (void) arg; reload(); } },
+        { "quit",   [this](const std::string& arg) { (void) arg; quit(); } }
+        #ifdef BONUS
+        ,{ "logs",   [this](const std::string& arg) { (void) arg; logs(); } }
+        #endif
+    };
+}
 
-    for (char ch : str) {
-        if (delimiters.find(ch) != std::string::npos) {
-            if (!current.empty()) {
-                tokens.push_back(current);
-                current.clear();
-            }
-        } else {
-            current += ch;
+void    Shell::init_programs_list_vector( void ) {
+    std::map<std::string, ProgramConfig> programs = this->_pm->getConfig().getPrograms();
+
+    for (std::map<std::string, ProgramConfig>::iterator it=programs.begin(); it!=programs.end(); ++it)
+        this->_programs_list.push_back(it->first);
+}
+
+void    Shell::readline_util( void ) {
+    while ((this->_readline_return = readline("\033[38;5;154mtaskmaster> \033[0m"))) {
+        if (this->_readline_return && *this->_readline_return)
+            add_history(this->_readline_return);
+
+        if (this->_readline_return) {
+            std::string command = this->_readline_return;
+
+            this->functionsCall(command);
+
+            free(this->_readline_return);
         }
     }
-
-    if (!current.empty())
-        tokens.push_back(current);
-
-    return tokens;
 }
 
 // void    Shell::run( void ) {
