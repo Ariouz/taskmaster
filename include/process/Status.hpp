@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 enum class Status {
     STARTING,
     RUNNING,
@@ -9,3 +11,5 @@ enum class Status {
     FATAL,
     UNKNOWN
 };
+
+std::ostream& operator<<(std::ostream& os, Status status);

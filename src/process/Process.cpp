@@ -54,3 +54,19 @@ bool  Process::shouldRestart(int exitCode, bool killedBySignal = false) const {
 
     return true;
 }
+
+std::string Process::uptimeStr( void ) const {
+    time_t now = std::time(nullptr);
+    time_t time = now - this->_start_time;
+
+    int hours = time / 3600;
+    int minutes = (time % 3600) / 60;
+    int seconds = time % 60;
+
+    std::ostringstream oss;
+    oss << std::setfill('0') << std::setw(2) << hours << ":"
+        << std::setfill('0') << std::setw(2) << minutes << ":"
+        << std::setfill('0') << std::setw(2) << seconds;
+
+    return oss.str();
+}

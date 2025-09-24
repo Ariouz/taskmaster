@@ -36,7 +36,8 @@ umask=022
 
 [program:secondprogram]
 command=/bin/echo "Second Program Running"
-numprocs=1
+process_name=%(program_name)s_%(process_num)s
+numprocs=2
 autostart=false
 autorestart=false
 startsecs=1
@@ -51,7 +52,8 @@ umask=022
 
 [program:failprogram]
 command=/bin/false
-numprocs=1
+process_name=%(program_name)s_%(process_num)s
+numprocs=3
 autostart=true
 autorestart=unexpected
 startsecs=1

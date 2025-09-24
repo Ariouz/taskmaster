@@ -32,7 +32,8 @@ void    Config::load() {
         YAML::Node node = it->second;
 
         ProgramConfig progconf(program_name, node);
-        this->_programs[program_name] = progconf;
+        if (program_name != "null")
+            this->_programs[program_name] = progconf;
     }
 
 }
