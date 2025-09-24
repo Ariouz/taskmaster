@@ -1,6 +1,5 @@
 #include "Shell.hpp"
 #include "Logger.hpp"
-#include "StatusUtils.hpp"
 #include <thread>
 
 std::vector<std::string> Shell::_commands = { "run", "status", "start", "stop", "reload", "quit",
@@ -179,7 +178,7 @@ void    Shell::status( const std::string& arg ) {
             if (proc.getName() == program) {
                 std::cout << proc.getName()
                 << "[" << count << "]: pid=" << proc.getPid()
-                << " status=" << StatusUtils::toString(proc.getStatus());
+                << " status=" << proc.getStatus();
 
                 if (proc.getStatus() == Status::RUNNING)
                     std::cout << " uptime=" << proc.uptimeStr();

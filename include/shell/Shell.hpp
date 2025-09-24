@@ -10,9 +10,9 @@
 #include <sstream>
 #include <mutex>
 #include "ProcessManager.hpp"
-#include <atomic>
 #include "Logger.hpp"
 #include "Status.hpp"
+#include <atomic>
 
 extern std::atomic<bool> logs_mode_flag;
 
