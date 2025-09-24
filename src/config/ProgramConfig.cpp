@@ -7,10 +7,10 @@ ProgramConfig::ProgramConfig( void ) = default;
 
 ProgramConfig::ProgramConfig(const std::string& name, const YAML::Node& node) {
     this->_program_name = name;
-    this->_cmd = node["cmd"].as<std::string>();
-    this->_numprocs = node["numprocs"].as<int>();
-    this->_umask = node["umask"].as<mode_t>();
-    this->_workingdir = node["workingdir"].as<std::string>();
+    this->initCmd( node );
+    this->initNumprocs( node );
+    this->initUmask( node );
+    this->initWorkingdir( node );
     this->_autostart = node["autostart"].as<bool>();
     this->_autorestart = parseAutoRestart(node["autorestart"].as<std::string>());
     if (node["exitcodes"]) {
@@ -163,6 +163,44 @@ void ProgramConfig::setEnv(const std::map<std::string, std::string>& env) {
 
 
 ////////// Functions ////////// 
+
+void    ProgramConfig::initNumprocs( const YAML::Node& node ) {
+    try
+    {
+        this->_numprocs = node["numprocs"].as<int>();
+    }
+    catch (std::exception& e)
+    {
+        std::string msg = "Please initiate numprocs field of " + this->_program_name + "program on configuration file.";
+        Logger::warn(msg);
+    }
+}
+
+void    ProgramConfig::initCmd( const YAML::Node& node ) {
+    this->_cmd = node["cmd"].as<std::string>();
+    if (this->_cmd == "null") {
+        std::cerr << "[WARNING] Please initiate cmd field of " + this->_program_name + " program on configuration file." << std::endl;
+        exit (EXIT_FAILURE);
+    }
+}
+
+void    ProgramConfig::initUmask( const YAML::Node& node ) {
+    try
+    {
+        this->_umask = node["umask"].as<mode_t>();
+    }
+    catch (std::exception& e)
+    {
+        std::string msg = "Please initiate umask field of " + this->_program_name + "program on configuration file.";
+        Logger::warn(msg);
+    }
+}
+
+void    ProgramConfig::initWorkingdir( const YAML::Node& node ) {
+    this->_workingdir = node["workingdir"].as<std::string>();
+    if (this->_workingdir == "null")
+        this->_workingdir = ".";
+}
 
 AutoRestart ProgramConfig::parseAutoRestart(const std::string& s) {
     if (s == "never") return AutoRestart::NEVER;

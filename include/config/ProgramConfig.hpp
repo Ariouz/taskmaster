@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <yaml-cpp/yaml.h>
+#include "Logger.hpp"
 
 enum AutoRestart {
     NEVER,
@@ -26,9 +27,14 @@ class ProgramConfig {
         int _starttime = 1;
         std::string _stopsignal = "TERM";
         int _stoptime = 10;
-        std::string _stdout_file;
-        std::string _stderr_file;
+        std::string _stdout_file = "/dev/null";
+        std::string _stderr_file = "/dev/null";
         std::map<std::string, std::string> _env;
+
+        void    initNumprocs( const YAML::Node& node );
+        void    initCmd( const YAML::Node& node );
+        void    initUmask( const YAML::Node& node );
+        void    initWorkingdir( const YAML::Node& node );
     
     public:
         ProgramConfig( void );
