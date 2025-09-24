@@ -10,14 +10,12 @@
 #include <sstream>
 #include <mutex>
 #include "ProcessManager.hpp"
-<<<<<<< HEAD
-#include <atomic>
-
-extern std::atomic<bool> logs_mode_flag;
-=======
 #include "Logger.hpp"
 #include "Status.hpp"
->>>>>>> refs/remotes/origin/main
+#include <atomic>
+
+
+extern std::atomic<bool> logs_mode_flag;
 
 class Shell {
 
