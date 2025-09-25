@@ -24,7 +24,7 @@ class ProgramConfig {
         AutoRestart _autorestart = AutoRestart::NEVER;
         std::vector<int> _exitcodes = {1};
         int _startretries = 3;
-        int _starttime = 1;
+        int _starttime = 5;
         std::string _stopsignal = "TERM";
         int _stoptime = 10;
         std::string _stdout_file = "/dev/null";
@@ -35,7 +35,18 @@ class ProgramConfig {
         void    initCmd( const YAML::Node& node );
         void    initUmask( const YAML::Node& node );
         void    initWorkingdir( const YAML::Node& node );
-    
+        void    initAutostart( const YAML::Node& node );
+        void    initAutorestart( const YAML::Node& node );
+        void    initExitcodes( const YAML::Node& node );
+        void    initStartretries( const YAML::Node& node );
+        void    initStarttime( const YAML::Node& node );
+        void    initStopsignal( const YAML::Node& node );
+        void    initStoptime( const YAML::Node& node );
+        void    initStdoutFile( const YAML::Node& node );
+        void    initStderrFile( const YAML::Node& node );
+        void    initEnv( const YAML::Node& node );
+
+
     public:
         ProgramConfig( void );
         ProgramConfig( const std::string& name, const YAML::Node& node );
@@ -56,7 +67,7 @@ class ProgramConfig {
         std::string                         getStdoutFile ( void ) const;
         std::string                         getStderrFile( void ) const;
         std::map<std::string, std::string>  getEnv( void ) const;
-        
+
         void setProgramName(const std::string& program_name);
         void setCmd(const std::string& cmd);
         void setNumprocs(int numprocs);
@@ -72,7 +83,6 @@ class ProgramConfig {
         void setStdoutFile(const std::string& stdout_file);
         void setStderrFile(const std::string& stderr_file);
         void setEnv(const std::map<std::string, std::string>& env);
-        
-        
+
         static AutoRestart parseAutoRestart(const std::string& s);
 };
