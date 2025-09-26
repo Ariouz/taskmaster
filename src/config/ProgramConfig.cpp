@@ -1,5 +1,13 @@
 #include "ProgramConfig.hpp"
 
+const std::map<std::string, int> ProgramConfig::_sig = {
+    {"HUP", SIGHUP},
+    {"INT", SIGINT},
+    {"QUIT", SIGQUIT},
+    {"USR1", SIGUSR1},
+    {"USR2", SIGUSR2},
+    {"TERM", SIGTERM}
+};
 
 ////////// Constructors | Destructor ////////// 
 
@@ -86,6 +94,10 @@ std::string ProgramConfig::getStderrFile( void ) const {
 
 std::map<std::string, std::string> ProgramConfig::getEnv( void ) const {
     return this->_env;
+}
+
+std::map<std::string, int>   ProgramConfig::getSig( void ) {
+    return _sig;
 }
 
 

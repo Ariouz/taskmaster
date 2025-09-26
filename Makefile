@@ -2,7 +2,7 @@
 NAME = taskmaster
 CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -g $(if $(BONUS),-DBONUS)
-LDFLAGS = -lreadline -lyaml-cpp
+LDFLAGS = -lreadline -lyaml-cpp -fsanitize=thread -fno-omit-frame-pointer -pthread
 
 SRC_DIR = src
 OBJ_DIR = obj

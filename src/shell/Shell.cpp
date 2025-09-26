@@ -151,7 +151,12 @@ void    Shell::init_programs_list_vector( void ) {
 }
 
 void    Shell::readline_util( void ) {
-    while ((this->_readline_return = readline("\033[38;5;154mtaskmaster> \033[0m"))) {
+    while (1) {
+        this->_readline_return = readline("\033[38;5;154mtaskmaster> \033[0m");
+
+        if (!this->_readline_return)
+            this->quit();
+
         if (this->_readline_return && *this->_readline_return)
             add_history(this->_readline_return);
 
@@ -244,7 +249,8 @@ void    Shell::stop( const std::string& arg ) {
             if (proc.getName() == program) {
                 std::cout << proc.getName()
                 << "[" << count << "]: ";
-                int signal = SIGTERM;
+                std::string sigstr = _pm->getConfig().getPrograms()[program].getStopsignal();
+                int signal = _pm->getConfig().getPrograms()[program].getSig()[sigstr];
 
                 if (kill(proc.getPid(), signal) == 0) {
                     std::cout << "stopped" << std::endl;
@@ -269,10 +275,19 @@ void    Shell::reload() {
     std::lock_guard<std::mutex> lock(_pm->getMutex());
 }
 
-void    Shell::quit() {
-    std::cout << "quit" << std::endl;
+void    Shell::quit( void ) {
+    std::streambuf* cout_buf = std::cout.rdbuf();
+    std::ofstream null_stream("/dev/null");
+    std::cout.rdbuf(null_stream.rdbuf());
+
+    this->stop("");
+
+    std::cout.rdbuf(cout_buf);
+
+    free(this->_readline_return);
+
     std::lock_guard<std::mutex> lock(_pm->getMutex());
-    // stop processes + exit
+    exit (0);
 }
 
 #ifdef BONUS

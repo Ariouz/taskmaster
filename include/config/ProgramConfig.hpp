@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <yaml-cpp/yaml.h>
+#include <csignal>
 #include "Logger.hpp"
 
 enum AutoRestart {
@@ -15,21 +16,22 @@ enum AutoRestart {
 
 class ProgramConfig {
     private:
-        std::string _program_name;
-        std::string _cmd;
-        int _numprocs = 1;
-        mode_t _umask = 022;
-        std::string _workingdir = ".";
-        bool _autostart = false;
-        AutoRestart _autorestart = AutoRestart::NEVER;
-        std::vector<int> _exitcodes = {1};
-        int _startretries = 3;
-        int _starttime = 5;
-        std::string _stopsignal = "TERM";
-        int _stoptime = 10;
-        std::string _stdout_file = "/dev/null";
-        std::string _stderr_file = "/dev/null";
-        std::map<std::string, std::string> _env;
+        std::string                         _program_name;
+        std::string                         _cmd;
+        int                                 _numprocs = 1;
+        mode_t                              _umask = 022;
+        std::string                         _workingdir = ".";
+        bool                                _autostart = false;
+        AutoRestart                         _autorestart = AutoRestart::NEVER;
+        std::vector<int>                    _exitcodes = {1};
+        int                                 _startretries = 3;
+        int                                 _starttime = 5;
+        std::string                         _stopsignal = "TERM";
+        int                                 _stoptime = 10;
+        std::string                         _stdout_file = "/dev/null";
+        std::string                         _stderr_file = "/dev/null";
+        std::map<std::string, std::string>  _env;
+        static const std::map<std::string, int>   _sig;
 
         void    _initNumprocs( const YAML::Node& node );
         void    _initCmd( const YAML::Node& node );
@@ -67,6 +69,7 @@ class ProgramConfig {
         std::string                         getStdoutFile ( void ) const;
         std::string                         getStderrFile( void ) const;
         std::map<std::string, std::string>  getEnv( void ) const;
+        std::map<std::string, int>          getSig( void );
 
         void setProgramName(const std::string& program_name);
         void setCmd(const std::string& cmd);
