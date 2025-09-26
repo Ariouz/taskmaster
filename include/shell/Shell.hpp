@@ -9,10 +9,13 @@
 #include <functional>
 #include <sstream>
 #include <mutex>
+#include <atomic>
+#include <thread>
+#include <signal.h>
+#include <unistd.h>
 #include "ProcessManager.hpp"
 #include "Logger.hpp"
 #include "Status.hpp"
-#include <atomic>
 
 extern std::atomic<bool> logs_mode_flag;
 
@@ -24,8 +27,9 @@ class Shell {
         static std::vector<std::string>                                             _programs_list;
         static const std::vector<std::string>*                                      _current_completion_list;
         static std::map<std::string, std::function<void(const std::string& arg)>>   _commands_functions;
+        ProcessManager*                                                             _pm;
 
-        ProcessManager*                                     _pm;
+        std::vector<std::string>    _initArgs( const std::string& arg );
 
     public:
         Shell() = default;
@@ -50,6 +54,5 @@ class Shell {
         #ifdef BONUS
         void            logs( void );
         #endif
-
 
 };

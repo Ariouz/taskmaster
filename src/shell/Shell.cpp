@@ -1,6 +1,4 @@
 #include "Shell.hpp"
-#include "Logger.hpp"
-#include <thread>
 
 std::vector<std::string> Shell::_commands = { "run", "status", "start", "stop", "reload", "quit",
     #ifdef BONUS
@@ -29,6 +27,19 @@ Shell::~Shell() = default;
 
 
 ////////// Functions ////////// 
+
+std::vector<std::string>    Shell::_initArgs( const std::string& arg ) {
+    std::vector<std::string> args;
+
+    if (arg.empty()) {
+        for (auto& program : _pm->getConfig().getPrograms())
+            args.push_back(program.second.getProgramName());
+    } else {
+        args = split_multi_delim(arg, " \t");
+    }
+
+    return  args;
+}
 
 char* Shell::command_generator(const char* text, int state) {
     static size_t list_index;
@@ -162,14 +173,7 @@ void    Shell::status( const std::string& arg ) {
 
     std::lock_guard<std::mutex> lock(_pm->getMutex());
 
-    std::vector<std::string> args;
-
-    if (arg.empty()) {
-        for (auto& program : _pm->getConfig().getPrograms())
-            args.push_back(program.second.getProgramName());
-    } else {
-        args = split_multi_delim(arg, " \t");
-    }
+    std::vector<std::string> args = this->_initArgs(arg);
 
     for (auto& program : args) {
         int count = 0;
@@ -229,9 +233,35 @@ void    Shell::start( const std::string& arg ) {
 }
 
 void    Shell::stop( const std::string& arg ) {
-    (void) arg;
-    std::cout << "stop" << arg << std::endl;
     std::lock_guard<std::mutex> lock(_pm->getMutex());
+
+    std::vector<std::string> args = this->_initArgs(arg);
+
+    for (auto& program : args) {
+        int count = 0;
+
+        for (auto& [pid, proc] : _pm->getProcesses()) {
+            if (proc.getName() == program) {
+                std::cout << proc.getName()
+                << "[" << count << "]: ";
+                int signal = SIGTERM;
+
+                if (kill(proc.getPid(), signal) == 0) {
+                    std::cout << "stopped" << std::endl;
+                } else {
+                    std::cout << "ERROR (not running)" << std::endl;
+                }
+
+                count++;
+            }
+        }
+
+        for (; count < _pm->getConfig().getPrograms()[program].getNumprocs(); ++count) {
+            std::cout << program
+            << ": ERROR (no such process)"
+            << std::endl;
+        }
+    }
 }
 
 void    Shell::reload() {

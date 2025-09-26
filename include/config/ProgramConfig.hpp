@@ -31,20 +31,20 @@ class ProgramConfig {
         std::string _stderr_file = "/dev/null";
         std::map<std::string, std::string> _env;
 
-        void    initNumprocs( const YAML::Node& node );
-        void    initCmd( const YAML::Node& node );
-        void    initUmask( const YAML::Node& node );
-        void    initWorkingdir( const YAML::Node& node );
-        void    initAutostart( const YAML::Node& node );
-        void    initAutorestart( const YAML::Node& node );
-        void    initExitcodes( const YAML::Node& node );
-        void    initStartretries( const YAML::Node& node );
-        void    initStarttime( const YAML::Node& node );
-        void    initStopsignal( const YAML::Node& node );
-        void    initStoptime( const YAML::Node& node );
-        void    initStdoutFile( const YAML::Node& node );
-        void    initStderrFile( const YAML::Node& node );
-        void    initEnv( const YAML::Node& node );
+        void    _initNumprocs( const YAML::Node& node );
+        void    _initCmd( const YAML::Node& node );
+        void    _initUmask( const YAML::Node& node );
+        void    _initWorkingdir( const YAML::Node& node );
+        void    _initAutostart( const YAML::Node& node );
+        void    _initAutorestart( const YAML::Node& node );
+        void    _initExitcodes( const YAML::Node& node );
+        void    _initStartretries( const YAML::Node& node );
+        void    _initStarttime( const YAML::Node& node );
+        void    _initStopsignal( const YAML::Node& node );
+        void    _initStoptime( const YAML::Node& node );
+        void    _initStdoutFile( const YAML::Node& node );
+        void    _initStderrFile( const YAML::Node& node );
+        void    _initEnv( const YAML::Node& node );
 
 
     public:

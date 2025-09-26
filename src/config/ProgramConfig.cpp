@@ -7,20 +7,20 @@ ProgramConfig::ProgramConfig( void ) = default;
 
 ProgramConfig::ProgramConfig(const std::string& name, const YAML::Node& node) {
     this->_program_name = name;
-    this->initCmd( node );
-    this->initNumprocs( node );
-    this->initUmask( node );
-    this->initWorkingdir( node );
-    this->initAutostart( node );
-    this->initAutorestart( node );
-    this->initExitcodes( node );
-    this->initStartretries( node );
-    this->initStarttime( node );
-    this->initStopsignal( node );
-    this->initStoptime( node );
-    this->initStdoutFile( node );
-    this->initStderrFile( node );
-    this->initEnv( node );
+    this->_initCmd( node );
+    this->_initNumprocs( node );
+    this->_initUmask( node );
+    this->_initWorkingdir( node );
+    this->_initAutostart( node );
+    this->_initAutorestart( node );
+    this->_initExitcodes( node );
+    this->_initStartretries( node );
+    this->_initStarttime( node );
+    this->_initStopsignal( node );
+    this->_initStoptime( node );
+    this->_initStdoutFile( node );
+    this->_initStderrFile( node );
+    this->_initEnv( node );
 }
 
 ProgramConfig::~ProgramConfig( void ) = default;
@@ -154,7 +154,7 @@ void ProgramConfig::setEnv(const std::map<std::string, std::string>& env) {
 
 ////////// Functions ////////// 
 
-void    ProgramConfig::initCmd( const YAML::Node& node ) {
+void    ProgramConfig::_initCmd( const YAML::Node& node ) {
     try
     {
         this->_cmd = node["cmd"].as<std::string>();
@@ -170,7 +170,7 @@ void    ProgramConfig::initCmd( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initNumprocs( const YAML::Node& node ) {
+void    ProgramConfig::_initNumprocs( const YAML::Node& node ) {
     try
     {
         this->_numprocs = node["numprocs"].as<int>();
@@ -182,7 +182,7 @@ void    ProgramConfig::initNumprocs( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initUmask( const YAML::Node& node ) {
+void    ProgramConfig::_initUmask( const YAML::Node& node ) {
     try
     {
         this->_umask = node["umask"].as<mode_t>();
@@ -194,7 +194,7 @@ void    ProgramConfig::initUmask( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initWorkingdir( const YAML::Node& node ) {
+void    ProgramConfig::_initWorkingdir( const YAML::Node& node ) {
     try
     {
         this->_workingdir = node["workingdir"].as<std::string>();
@@ -208,7 +208,7 @@ void    ProgramConfig::initWorkingdir( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initAutostart( const YAML::Node& node ) {
+void    ProgramConfig::_initAutostart( const YAML::Node& node ) {
     try
     {
         this->_autostart = node["autostart"].as<bool>();
@@ -220,7 +220,7 @@ void    ProgramConfig::initAutostart( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initAutorestart( const YAML::Node& node ) {
+void    ProgramConfig::_initAutorestart( const YAML::Node& node ) {
     try
     {
         this->_autorestart = parseAutoRestart(node["autorestart"].as<std::string>());
@@ -239,7 +239,7 @@ AutoRestart ProgramConfig::parseAutoRestart(const std::string& s) {
     throw std::invalid_argument("Invalid autorestart value: " + s);
 }
 
-void    ProgramConfig::initExitcodes( const YAML::Node& node ) {
+void    ProgramConfig::_initExitcodes( const YAML::Node& node ) {
     try
     {
         if (node["exitcodes"]) {
@@ -259,7 +259,7 @@ void    ProgramConfig::initExitcodes( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initStartretries( const YAML::Node& node ) {
+void    ProgramConfig::_initStartretries( const YAML::Node& node ) {
     try
     {
         this->_startretries = node["startretries"].as<int>();
@@ -271,7 +271,7 @@ void    ProgramConfig::initStartretries( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initStarttime( const YAML::Node& node ) {
+void    ProgramConfig::_initStarttime( const YAML::Node& node ) {
     try
     {
         this->_starttime = node["starttime"].as<int>();
@@ -283,7 +283,7 @@ void    ProgramConfig::initStarttime( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initStopsignal( const YAML::Node& node ) {
+void    ProgramConfig::_initStopsignal( const YAML::Node& node ) {
     try
     {
         this->_stopsignal = node["stopsignal"].as<std::string>();
@@ -301,7 +301,7 @@ void    ProgramConfig::initStopsignal( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initStoptime( const YAML::Node& node ) {
+void    ProgramConfig::_initStoptime( const YAML::Node& node ) {
     try
     {
         this->_stoptime = node["stoptime"].as<int>();
@@ -313,7 +313,7 @@ void    ProgramConfig::initStoptime( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initStdoutFile( const YAML::Node& node ) {
+void    ProgramConfig::_initStdoutFile( const YAML::Node& node ) {
     try
     {
         this->_stdout_file = node["stdout"].as<std::string>();
@@ -327,7 +327,7 @@ void    ProgramConfig::initStdoutFile( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initStderrFile( const YAML::Node& node ) {
+void    ProgramConfig::_initStderrFile( const YAML::Node& node ) {
     try
     {
         this->_stderr_file = node["stderr"].as<std::string>();
@@ -341,7 +341,7 @@ void    ProgramConfig::initStderrFile( const YAML::Node& node ) {
     }
 }
 
-void    ProgramConfig::initEnv( const YAML::Node& node ) {
+void    ProgramConfig::_initEnv( const YAML::Node& node ) {
     try
     {
         if (node["env"])
