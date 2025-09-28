@@ -13,6 +13,7 @@
 #include <thread>
 #include <signal.h>
 #include <unistd.h>
+#include <termios.h>
 #include "ProcessManager.hpp"
 #include "Logger.hpp"
 #include "Status.hpp"
@@ -36,6 +37,9 @@ class Shell {
         Shell(ProcessManager* pm);
         ~Shell();
 
+        void                        set_termios_handle( void );
+        static void                 sigint_handler( int signum );
+        void                        signal( void );
         static char*                command_generator( const char* text, int state );
         static char**               custom_completion( const char* text, int start, int end );
         std::vector<std::string>    split_multi_delim(const std::string& str, const std::string& delimiters);

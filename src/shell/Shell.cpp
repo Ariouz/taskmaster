@@ -10,7 +10,6 @@ std::vector<std::string> Shell::_programs_list;
 const std::vector<std::string>* Shell::_current_completion_list = &Shell::_commands;
 std::map<std::string, std::function<void(const std::string& arg)>> Shell::_commands_functions;
 
-
 ////////// Constructors | Destructor ////////// 
 
 Shell::Shell(ProcessManager* pm) : _pm(pm) {
@@ -39,6 +38,31 @@ std::vector<std::string>    Shell::_initArgs( const std::string& arg ) {
     }
 
     return  args;
+}
+
+void	Shell::set_termios_handle(void) {
+	struct termios	termios_p;
+
+	tcgetattr(STDIN_FILENO, &termios_p);
+	termios_p.c_lflag &= ~ECHOCTL;
+	tcsetattr(STDIN_FILENO, TCSANOW, &termios_p);
+}
+
+void	Shell::sigint_handler(int signum) {
+	(void) signum;
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
+
+void	Shell::signal(void) {
+	struct sigaction	action;
+
+	action.sa_handler = Shell::sigint_handler;
+	sigemptyset(&action.sa_mask);
+	action.sa_flags = 0;
+	sigaction(SIGINT, &action, NULL);
 }
 
 char* Shell::command_generator(const char* text, int state) {
@@ -152,6 +176,8 @@ void    Shell::init_programs_list_vector( void ) {
 
 void    Shell::readline_util( void ) {
     while (1) {
+        set_termios_handle();
+        signal();
         this->_readline_return = readline("\033[38;5;154mtaskmaster> \033[0m");
 
         if (!this->_readline_return)
