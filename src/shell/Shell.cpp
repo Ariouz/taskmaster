@@ -50,10 +50,14 @@ void	Shell::set_termios_handle(void) {
 
 void	Shell::sigint_handler(int signum) {
 	(void) signum;
-	printf("\n");
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+
+    if (logs_mode_flag.load()) logs_mode_flag.store(false);
+    else {
+        printf("\n");
+        rl_on_new_line();
+        rl_replace_line("", 0);
+        rl_redisplay();
+    }
 }
 
 void	Shell::signal(void) {
