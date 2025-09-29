@@ -147,19 +147,15 @@ void Shell::functionsCall( const std::string readline_return ) const {
         if (!arg.empty() && arg[0] == ' ')
             arg.erase(0, 1);
 
-        try
-        {
+        try {
             _commands_functions[command](arg);
-        }
-        catch (std::exception& e)
-        {
+        } catch (std::exception& e) {
             std::cerr << "*** Unknown syntax: " << command << std::endl;
         }
 }
 
 void    Shell::init_commands_functions_map( void ) {
     this->_commands_functions = {
-        // { "run",    [this](const std::string& arg) { run(); } },
         { "status", [this](const std::string& arg) { status(arg); } },
         { "start",  [this](const std::string& arg) { start(arg); } },
         { "stop",   [this](const std::string& arg) { stop(arg); } },
@@ -179,9 +175,9 @@ void    Shell::init_programs_list_vector( void ) {
 }
 
 void    Shell::readline_util( void ) {
+    set_termios_handle();
+    signal();
     while (1) {
-        set_termios_handle();
-        signal();
         this->_readline_return = readline("\033[38;5;154mtaskmaster> \033[0m");
 
         if (!this->_readline_return)
@@ -200,14 +196,8 @@ void    Shell::readline_util( void ) {
     }
 }
 
-// void    Shell::run( void ) {
-//     std::cout << "run" << std::endl;
-// }
-
 void    Shell::status( const std::string& arg ) {
-
     std::lock_guard<std::mutex> lock(_pm->getMutex());
-
     std::vector<std::string> args = this->_initArgs(arg);
 
     for (auto& program : args) {
@@ -238,8 +228,6 @@ void    Shell::status( const std::string& arg ) {
 }
 
 void    Shell::start( const std::string& arg ) {
-    std::cout << "start " << arg << std::endl;
-
     if (arg.empty()) {
         std::cerr << "Syntax: start <progam>" << std::endl;
         return ;
