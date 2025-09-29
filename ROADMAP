@@ -1,5 +1,5 @@
 [X] - Structure projet => Makefile, classes générales, utils
-[] - Lecture config et init
+[X] - Lecture config et init
 
 Gestion process:
 [X] - Boucle processes => umask(int) + fork + chdir(workdir config) + setenv
@@ -16,7 +16,7 @@ Boucle monitoring (Thread séparé while + sleep):
         [X] - Retry jusqu'au max_retries + log
 
 Signaux:
-[] - Gestion sig SIGHUB (reload config), SIGCHLD (fin de process), SIGINT/SIGTERM (clean exit)
+[] - Gestion sig SIGHUP (reload config)
 
 Gestion des logs:
 [X] => Logger (global)
@@ -25,7 +25,8 @@ Gestion des logs:
 
 BONUS:
 [X] => Logging syslog
-[] => Shell/Server séparés
-[] => Attach/detach
 [X] => Colorized logs, status
 [X] => Commande logs pour attacher les logs: verbose true, pas de readline, ctrl+c pour quitter le logs et retourner au shell, ctrl+c again = rien
+[x] => Status avec args
+[] => Shell/Server séparés
+[] => Attach/detach
