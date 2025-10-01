@@ -12,7 +12,7 @@ std::map<std::string, std::function<void(const std::string& arg)>> Shell::_comma
 
 ////////// Constructors | Destructor ////////// 
 
-Shell::Shell(ProcessManager* pm) : _pm(pm) {
+Shell::Shell(const std::string& configFile, ProcessManager* pm) : _pm(pm), _configFile(configFile) {
     this->init_commands_functions_map();
 
     this->init_programs_list_vector();
@@ -26,6 +26,10 @@ Shell::~Shell() = default;
 
 
 ////////// Functions ////////// 
+
+std::vector<std::string>&    Shell::get_programs_list( void ) {
+    return _programs_list;
+}
 
 std::vector<std::string>    Shell::_initArgs( const std::string& arg ) {
     std::vector<std::string> args;
@@ -180,6 +184,12 @@ void    Shell::readline_util( void ) {
     while (1) {
         this->_readline_return = readline("\033[38;5;154mtaskmaster> \033[0m");
 
+        if (SigUtils::getReceivedSIGHUP()) {
+            SigUtils::setReceivedSIGHUP(false);
+            this->reload();
+            continue;
+        }
+
         if (!this->_readline_return)
             this->quit();
 
@@ -288,9 +298,14 @@ void    Shell::stop( const std::string& arg ) {
     }
 }
 
-void    Shell::reload() {
-    std::cout << "reload" << std::endl;
+void    Shell::reload( void ) {
+    FileChecker::checkFile(this->_configFile);
+    this->_temp_config_reload = Config(this->_configFile);
+
     std::lock_guard<std::mutex> lock(_pm->getMutex());
+
+    FileChecker::yamlComparator(*this->_pm, this->_temp_config_reload.getPrograms());
+    
 }
 
 void    Shell::quit( void ) {

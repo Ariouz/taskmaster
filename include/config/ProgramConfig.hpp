@@ -22,10 +22,10 @@ class ProgramConfig {
         mode_t                              _umask = 022;
         std::string                         _workingdir = ".";
         bool                                _autostart = false;
-        AutoRestart                         _autorestart = AutoRestart::NEVER;
         std::vector<int>                    _exitcodes = {1};
         int                                 _startretries = 3;
         int                                 _starttime = 5;
+        AutoRestart                         _autorestart = AutoRestart::NEVER;
         std::string                         _stopsignal = "TERM";
         int                                 _stoptime = 10;
         std::string                         _stdout_file = "/dev/null";

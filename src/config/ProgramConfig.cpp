@@ -1,7 +1,6 @@
 #include "ProgramConfig.hpp"
 
 const std::map<std::string, int> ProgramConfig::_sig = {
-    {"HUP", SIGHUP},
     {"INT", SIGINT},
     {"QUIT", SIGQUIT},
     {"USR1", SIGUSR1},
@@ -300,9 +299,9 @@ void    ProgramConfig::_initStopsignal( const YAML::Node& node ) {
     {
         this->_stopsignal = node["stopsignal"].as<std::string>();
 
-        if (this->_stopsignal != "HUP" && this->_stopsignal != "INT"
-                && this->_stopsignal != "QUIT" && this->_stopsignal != "USR1"
-                && this->_stopsignal != "USR2" && this->_stopsignal != "TERM") {
+        if (this->_stopsignal != "INT" && this->_stopsignal != "QUIT"
+            && this->_stopsignal != "USR1" && this->_stopsignal != "USR2"
+            && this->_stopsignal != "TERM") {
             this->_stopsignal = "TERM";
         }
     }

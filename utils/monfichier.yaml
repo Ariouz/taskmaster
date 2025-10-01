@@ -21,7 +21,8 @@ password=admin
 
 [program:myprogram]
 command=/bin/sleep 60
-numprocs=1
+process_name=%(program_name)s_%(process_num)s
+numprocs=3
 autostart=true
 autorestart=true
 startsecs=1

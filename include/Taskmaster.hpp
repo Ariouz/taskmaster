@@ -4,6 +4,10 @@
 #include "ProcessManager.hpp"
 #include "Shell.hpp"
 #include "Logger.hpp"
+#include "FileChecker.hpp"
+#include "SigUtils.hpp"
+#include <thread>
+#include <csignal>
 
 
 class Taskmaster {

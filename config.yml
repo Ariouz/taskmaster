@@ -1,6 +1,6 @@
 programs:
   sleeper:
-    cmd: "sleep 10"
+    cmd: "sleep 1000"
     numprocs: 2
     umask: 022
     workingdir: .

@@ -17,6 +17,8 @@
 #include "ProcessManager.hpp"
 #include "Logger.hpp"
 #include "Status.hpp"
+#include "FileChecker.hpp"
+#include "SigUtils.hpp"
 
 extern std::atomic<bool> logs_mode_flag;
 
@@ -29,13 +31,17 @@ class Shell {
         static const std::vector<std::string>*                                      _current_completion_list;
         static std::map<std::string, std::function<void(const std::string& arg)>>   _commands_functions;
         ProcessManager*                                                             _pm;
+        std::string                                                                 _configFile;
+        Config                                                                      _temp_config_reload;
 
         std::vector<std::string>    _initArgs( const std::string& arg );
 
     public:
         Shell() = default;
-        Shell(ProcessManager* pm);
+        Shell(const std::string& configFile, ProcessManager* pm);
         ~Shell();
+
+        static std::vector<std::string>&    get_programs_list( void );
 
         void                        set_termios_handle( void );
         static void                 sigint_handler( int signum );

@@ -1,5 +1,4 @@
 #include "Config.hpp"
-#include "Logger.hpp"
 
 
 ////////// Constructors | Destructor ////////// 
@@ -16,7 +15,7 @@ Config::~Config() = default;
 
 ////////// Getters ////////// 
 
-std::map<std::string, ProgramConfig>    Config::getPrograms( void ) const {
+std::map<std::string, ProgramConfig>&    Config::getPrograms( void ) {
     return this->_programs;
 }
 

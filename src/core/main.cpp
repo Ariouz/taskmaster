@@ -5,8 +5,11 @@
 #include "Taskmaster.hpp"
 #include "FileChecker.hpp"
 #include "Logger.hpp"
+#include "SigUtils.hpp"
 
 int main(int argc, char *argv[]) {
+
+    std::signal(SIGHUP, SigUtils::handleSIGHUP);
 
     try
     {

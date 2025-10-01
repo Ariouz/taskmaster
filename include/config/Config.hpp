@@ -5,6 +5,7 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 #include "ProgramConfig.hpp"
+#include "Logger.hpp"
 
 class Config {
 	private:
@@ -16,7 +17,7 @@ class Config {
 		Config(const std::string& path);
 		~Config();
 
-        std::map<std::string, ProgramConfig>    getPrograms( void ) const;
+        std::map<std::string, ProgramConfig>&    getPrograms( void );
 
 		void load();
 		void reload();

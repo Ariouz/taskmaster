@@ -1,9 +1,4 @@
 #include "Taskmaster.hpp"
-#include "FileChecker.hpp"
-#include "Config.hpp"
-#include "Shell.hpp"
-#include <thread>
-#include <csignal>
 
 std::atomic<bool>       logs_mode_flag {false};
 
@@ -23,7 +18,7 @@ Taskmaster::Taskmaster(const std::string& configFile) {
     });
 
     monitorThread.detach();
-    this->_shell = Shell(_process_manager.get());
+    this->_shell = Shell(configFile, _process_manager.get());
 
 }
 
