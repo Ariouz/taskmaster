@@ -209,29 +209,32 @@ void    Shell::readline_util( void ) {
 void    Shell::status( const std::string& arg ) {
     std::lock_guard<std::mutex> lock(_pm->getMutex());
     std::vector<std::string> args = this->_initArgs(arg);
+    std::string str = "";
 
     for (auto& program : args) {
         int count = 0;
 
         for (auto& [pid, proc] : _pm->getProcesses()) {
             if (proc.getName() == program) {
-                std::cout << proc.getName()
-                << "[" << count << "]: pid=" << proc.getPid()
-                << " status=" << proc.getStatus();
+                str = proc.getName() + std::string("[") + std::to_string(count)
+                        + std::string("]: pid=") + std::to_string(proc.getPid())
+                        + std::string(" status=") + proc.statusToString(proc.getStatus());
 
-                if (proc.getStatus() == Status::RUNNING)
-                    std::cout << " uptime=" << proc.uptimeStr();
+                if (proc.getStatus() == Status::RUNNING) {
+                    str += std::string(" uptime=") + proc.uptimeStr();
+                }
 
-                std::cout << std::endl;
+                std::cout << str << std::endl;
+                Logger::info(str);
 
                 count++;
             }
         }
 
         for (; count < _pm->getConfig().getPrograms()[program].getNumprocs(); ++count) {
-            std::cout << program
-            << ": ERROR (no such process)"
-            << std::endl;
+            str = program + std::string(": ERROR (no such process)");
+            std::cerr << str << std::endl;
+            Logger::error(str);
         }
     }
     
@@ -268,6 +271,7 @@ void    Shell::start( const std::string& arg ) {
 void    Shell::stop( const std::string& arg ) {
     std::lock_guard<std::mutex> lock(_pm->getMutex());
 
+    std::string str = "";
     std::vector<std::string> args = this->_initArgs(arg);
 
     for (auto& program : args) {
@@ -275,15 +279,19 @@ void    Shell::stop( const std::string& arg ) {
 
         for (auto& [pid, proc] : _pm->getProcesses()) {
             if (proc.getName() == program) {
-                std::cout << proc.getName()
-                << "[" << count << "]: ";
+                str = proc.getName() + std::string("[") + std::to_string(count) + std::string("]: ");
+
                 std::string sigstr = _pm->getConfig().getPrograms()[program].getStopsignal();
                 int signal = _pm->getConfig().getPrograms()[program].getSig()[sigstr];
 
                 if (kill(proc.getPid(), signal) == 0) {
-                    std::cout << "stopped" << std::endl;
+                    str += "stopped";
+                    std::cout << str << std::endl;
+                    Logger::info(str);
                 } else {
-                    std::cout << "ERROR (not running)" << std::endl;
+                    str += "ERROR (not running)";
+                    std::cerr << str << std::endl;
+                    Logger::error(str);
                 }
 
                 count++;
@@ -309,6 +317,7 @@ void    Shell::reload( void ) {
 }
 
 void    Shell::quit( void ) {
+    std::string pid;
     std::streambuf* cout_buf = std::cout.rdbuf();
     std::ofstream null_stream("/dev/null");
     std::cout.rdbuf(null_stream.rdbuf());
@@ -316,6 +325,13 @@ void    Shell::quit( void ) {
     this->stop("");
 
     std::cout.rdbuf(cout_buf);
+
+    for (const auto& pair : _pm->getProcesses()) {
+        pid = std::to_string(pair.first);
+        if (kill(pair.first, SIGKILL) == 0) {
+            Logger::info("pid " + pid + " killed");
+        }
+    }
 
     free(this->_readline_return);
 

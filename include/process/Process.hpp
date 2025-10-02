@@ -36,4 +36,5 @@ class Process {
 
         bool              shouldRestart(int exitCode, bool killedBySignal) const;
         std::string       uptimeStr( void ) const;
+        std::string       statusToString( Status s );
 };

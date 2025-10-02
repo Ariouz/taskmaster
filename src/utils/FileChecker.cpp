@@ -82,6 +82,7 @@ void FileChecker::yamlComparatorElements( std::set<std::string>& commonKeys,
 void    FileChecker::yamlComparatorElementsDelete( ProcessManager& pm,
             std::set<std::string> commonKeys, std::set<std::string> baseKeys,
             std::set<std::string> toCompareKeys ) {
+
     std::set<std::string> onlyInBase;
     std::vector<int> pid_list;
 
@@ -95,11 +96,12 @@ void    FileChecker::yamlComparatorElementsDelete( ProcessManager& pm,
             if (pair.second.getName() == k) {
                 pid_list.push_back(pair.first);
 
-                if (kill(pair.first, pair.second.getConfig().getSig()[pair.second.getConfig().getStopsignal()]) == 0)
-                    std::cout << "stopped: " << k << std::endl;
+                if (kill(pair.first, pair.second.getConfig().getSig()[pair.second.getConfig().getStopsignal()]) == 0) {
+                    Logger::info(k + ": stopped");
+                }
 
                 if (kill(pair.first, SIGKILL) == 0)
-                    std::cout << "killed " << k << std::endl;
+                    Logger::info(k + ": killed");
             }
         }
     }
@@ -119,6 +121,7 @@ void    FileChecker::yamlComparatorElementsAddAndStart(  ProcessManager& pm,
             std::map<std::string, ProgramConfig> toCompare,
             std::set<std::string> commonKeys, std::set<std::string> baseKeys,
             std::set<std::string> toCompareKeys ) {
+
     std::set<std::string> onlyInToCompare;
 
     std::set_difference(toCompareKeys.begin(), toCompareKeys.end(), baseKeys.begin(), baseKeys.end(),
