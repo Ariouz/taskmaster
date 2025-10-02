@@ -19,13 +19,10 @@ void    FileChecker::checkFile( const std::string& configFile ) {
     
 }
 
-std::map<std::string, ProgramConfig> FileChecker::yamlComparator( ProcessManager& pm,
-                                                                    std::map<std::string, ProgramConfig> toCompare ) {
+void FileChecker::yamlComparator( ProcessManager& pm, std::map<std::string, ProgramConfig> toCompare ) {
 
-    std::map<std::string, ProgramConfig> base;
-    std::set<std::string> commonKeys, baseKeys, toCompareKeys, onlyInBase, onlyInToCompare;
-
-    base = pm.getConfig().getPrograms();
+    std::set<std::string> commonKeys, baseKeys, toCompareKeys;
+    std::map<std::string, ProgramConfig> base = pm.getConfig().getPrograms();
 
     for (const auto& [key, _] : base)
         if (toCompare.find(key) != toCompare.end())
@@ -40,61 +37,10 @@ std::map<std::string, ProgramConfig> FileChecker::yamlComparator( ProcessManager
     for (const auto& [key, _] : toCompare)
         toCompareKeys.insert(key);
 
-    std::set_difference(baseKeys.begin(), baseKeys.end(), toCompareKeys.begin(), toCompareKeys.end(),
-                        std::inserter(onlyInBase, onlyInBase.begin()));
+    FileChecker::yamlComparatorElementsDelete(pm, commonKeys, baseKeys, toCompareKeys );
 
-    if (!onlyInBase.empty()) {
-        for (const auto& k : onlyInBase) {
-            for (auto it = pm.getProcesses().begin(); it != pm.getProcesses().end(); ) {
-                if (it->second.getName() == k) {
-                    if (kill(it->first, it->second.getConfig().getSig()[it->second.getConfig().getStopsignal()]) == 0)
-                        std::cout << "stopped: " << k << std::endl;
-                    else {
-                        break;
-                    }
+    yamlComparatorElementsAddAndStart(pm, toCompare, commonKeys, baseKeys, toCompareKeys);
 
-                    if (kill(it->first, SIGKILL) == 0) {
-                        std::cout << "killed " << k << std::endl;
-                        auto it_tmp = std::next(it);
-                        pm.getProcesses().erase(it->first);
-                        it = it_tmp;
-                    }
-                    else {
-                        break;
-                    }
-                }
-                else
-                    it++;
-            }
-            auto& list = Shell::get_programs_list();
-            list.erase(std::remove(list.begin(), list.end(), k), list.end());
-
-            pm.getConfig().getPrograms().erase(k);
-        }
-    }
-
-    std::set_difference(toCompareKeys.begin(), toCompareKeys.end(), baseKeys.begin(), baseKeys.end(),
-                        std::inserter(onlyInToCompare, onlyInToCompare.begin()));
-
-    if (!onlyInToCompare.empty()) {
-        /*
-            Lancer les applications
-        */
-        std::cout << "Clés uniquement dans map2 :\n";
-        for (const auto& k : onlyInToCompare) std::cout << "- " << k << "\n";
-        //ajouter les services dans process et penser a les lancer avec les services qui ont ete modifies
-        for (const auto& k : onlyInToCompare) {
-            auto& list = Shell::get_programs_list();
-            list.push_back(k);
-
-            pm.getConfig().getPrograms()[k] = toCompare[k];
-        }
-    }
-
-    //Traiter commonKeys afin pouvoir changer les atibuts de pm.getConfig().getPrograms() et egalement au niveau des
-    //processes, puis lancer les services avec ceux qui n existe que dans la liste update.
-
-    return base;
 }
 
 void FileChecker::yamlComparatorElements( std::set<std::string>& commonKeys,
@@ -131,6 +77,79 @@ void FileChecker::yamlComparatorElements( std::set<std::string>& commonKeys,
     }
 
     commonKeys = tempKeys;
+}
+
+void    FileChecker::yamlComparatorElementsDelete( ProcessManager& pm,
+            std::set<std::string> commonKeys, std::set<std::string> baseKeys,
+            std::set<std::string> toCompareKeys ) {
+    std::set<std::string> onlyInBase;
+    std::vector<int> pid_list;
+
+    std::set_difference(baseKeys.begin(), baseKeys.end(), toCompareKeys.begin(), toCompareKeys.end(),
+                        std::inserter(onlyInBase, onlyInBase.begin()));
+
+    onlyInBase.insert(commonKeys.begin(), commonKeys.end());
+
+    for (const auto& k : onlyInBase) {
+        for (const auto& pair : pm.getProcesses()) {
+            if (pair.second.getName() == k) {
+                pid_list.push_back(pair.first);
+
+                if (kill(pair.first, pair.second.getConfig().getSig()[pair.second.getConfig().getStopsignal()]) == 0)
+                    std::cout << "stopped: " << k << std::endl;
+
+                if (kill(pair.first, SIGKILL) == 0)
+                    std::cout << "killed " << k << std::endl;
+            }
+        }
+    }
+
+    for (const auto& k : pid_list)
+        pm.getProcesses().erase(k);
+
+    for (const auto& k : onlyInBase) {
+        auto& list = Shell::get_programs_list();
+        list.erase(std::remove(list.begin(), list.end(), k), list.end());
+
+        pm.getConfig().getPrograms().erase(k);
+    }
+}
+
+void    FileChecker::yamlComparatorElementsAddAndStart(  ProcessManager& pm,
+            std::map<std::string, ProgramConfig> toCompare,
+            std::set<std::string> commonKeys, std::set<std::string> baseKeys,
+            std::set<std::string> toCompareKeys ) {
+    std::set<std::string> onlyInToCompare;
+
+    std::set_difference(toCompareKeys.begin(), toCompareKeys.end(), baseKeys.begin(), baseKeys.end(),
+                        std::inserter(onlyInToCompare, onlyInToCompare.begin()));
+
+    onlyInToCompare.insert(commonKeys.begin(), commonKeys.end());
+
+    if (!onlyInToCompare.empty()) {
+        for (const auto& k : onlyInToCompare) {
+            auto& list = Shell::get_programs_list();
+            list.push_back(k);
+
+            pm.getConfig().getPrograms()[k] = toCompare[k];
+        }
+
+        std::map<std::string, ProgramConfig> programs;
+
+        for (const auto& k : onlyInToCompare)
+            programs[k] = pm.getConfig().getPrograms()[k];
+
+        for(const auto& [name, progConf] : programs) {
+            if (!progConf.getAutostart()) continue;
+
+            for (int i = 0; i < progConf.getNumprocs(); i++) {
+                Process process = pm.createProcess(progConf);
+                if (process.getPid() == -1) continue;
+
+                pm.getProcesses().emplace(process.getPid(), process);
+            }
+        }
+    }
 }
 
 const char *FileChecker::NoFileException::what( void ) const throw() {

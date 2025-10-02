@@ -6,16 +6,26 @@
 #include "Logger.hpp"
 #include "Config.hpp"
 #include "Shell.hpp"
+#include "Process.hpp"
 
 class FileChecker {
 
     public:
         static void                                 checkFile( const std::string& configFile );
-        static std::map<std::string, ProgramConfig> yamlComparator( ProcessManager& pm,
+        static void                                 yamlComparator( ProcessManager& pm,
                                                         std::map<std::string, ProgramConfig> toCompare );
         static void                                 yamlComparatorElements( std::set<std::string>& commonKeys,
                                                         std::map<std::string, ProgramConfig> base,
                                                         std::map<std::string, ProgramConfig> toCompare );
+        static void                                 yamlComparatorElementsDelete( ProcessManager& pm,
+                                                        std::set<std::string> commonKeys,
+                                                        std::set<std::string> baseKeys,
+                                                        std::set<std::string> toCompareKeys );
+        static void                                 yamlComparatorElementsAddAndStart( ProcessManager& pm,
+                                                        std::map<std::string, ProgramConfig> toCompare,
+                                                        std::set<std::string> commonKeys,
+                                                        std::set<std::string> baseKeys,
+                                                        std::set<std::string> toCompareKeys );
 
         class NoFileException : public std::exception {
 			public:
