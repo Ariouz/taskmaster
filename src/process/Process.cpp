@@ -70,17 +70,3 @@ std::string Process::uptimeStr( void ) const {
 
     return oss.str();
 }
-
-std::string Process::statusToString( Status s ) {
-    switch (s) {
-        case Status::STARTING: return "STARTING";
-        case Status::RUNNING: return "RUNNING";
-        case Status::STOPPING: return "STOPPING";
-        case Status::STOPPED: return "STOPPED";
-        case Status::EXITED: return "EXITED";
-        case Status::FATAL: return "FATAL";
-        case Status::UNKNOWN: return "UNKNOWN";
-        default: return "UNKNOWN";
-    }
-}
-

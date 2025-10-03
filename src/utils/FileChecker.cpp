@@ -40,7 +40,8 @@ void FileChecker::yamlComparator( ProcessManager& pm, std::map<std::string, Prog
     FileChecker::yamlComparatorElementsDelete(pm, commonKeys, baseKeys, toCompareKeys );
 
     yamlComparatorElementsAddAndStart(pm, toCompare, commonKeys, baseKeys, toCompareKeys);
-
+    Logger::info("Config reloaded");
+    std::cout << "Config reloaded" << std::endl;
 }
 
 void FileChecker::yamlComparatorElements( std::set<std::string>& commonKeys,

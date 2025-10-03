@@ -16,17 +16,15 @@ Boucle monitoring (Thread séparé while + sleep):
         [X] - Retry jusqu'au max_retries + log
 
 Signaux:
-[] - Gestion sig SIGHUP (reload config)
+[X] - Gestion sig SIGHUP (reload config)
 
 Gestion des logs:
 [X] => Logger (global)
 [X] => Redirection des sorties std vers fd pour les process => dup2 + fichier (def dans config)
-[] - Shell interactif => lib readline => status de process, start/stop/restart, reload, quit 
+[X] - Shell interactif => lib readline => status de process, start/stop/restart, reload, quit 
 
 BONUS:
 [X] => Logging syslog
 [X] => Colorized logs, status
 [X] => Commande logs pour attacher les logs: verbose true, pas de readline, ctrl+c pour quitter le logs et retourner au shell, ctrl+c again = rien
 [x] => Status avec args
-[] => Shell/Server séparés
-[] => Attach/detach

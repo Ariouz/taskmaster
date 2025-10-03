@@ -216,15 +216,16 @@ void    Shell::status( const std::string& arg ) {
 
         for (auto& [pid, proc] : _pm->getProcesses()) {
             if (proc.getName() == program) {
-                str = proc.getName() + std::string("[") + std::to_string(count)
-                        + std::string("]: pid=") + std::to_string(proc.getPid())
-                        + std::string(" status=") + proc.statusToString(proc.getStatus());
+                std::stringstream ss;
+                ss << proc.getName() << std::string("[") << std::to_string(count)
+                        << std::string("]: pid=") << std::to_string(proc.getPid())
+                        << std::string(" status=") << proc.getStatus();
 
                 if (proc.getStatus() == Status::RUNNING) {
-                    str += std::string(" uptime=") + proc.uptimeStr();
+                    ss << std::string(" uptime=") + proc.uptimeStr();
                 }
 
-                std::cout << str << std::endl;
+                std::cout << ss.str() << std::endl;
                 Logger::info(str);
 
                 count++;
@@ -307,24 +308,29 @@ void    Shell::stop( const std::string& arg ) {
 }
 
 void    Shell::reload( void ) {
+    Logger::info("Config reload requested...");
+    std::cout << "Config reload requested..." << std::endl;
     FileChecker::checkFile(this->_configFile);
     this->_temp_config_reload = Config(this->_configFile);
 
     std::lock_guard<std::mutex> lock(_pm->getMutex());
 
     FileChecker::yamlComparator(*this->_pm, this->_temp_config_reload.getPrograms());
-    
 }
 
 void    Shell::quit( void ) {
     std::string pid;
     std::streambuf* cout_buf = std::cout.rdbuf();
+    std::streambuf* cerr_buf = std::cout.rdbuf();
     std::ofstream null_stream("/dev/null");
     std::cout.rdbuf(null_stream.rdbuf());
+    std::cerr.rdbuf(null_stream.rdbuf());
 
+    Logger::info("Quit requested, exiting processes...");
     this->stop("");
 
     std::cout.rdbuf(cout_buf);
+    std::cerr.rdbuf(cerr_buf);
 
     for (const auto& pair : _pm->getProcesses()) {
         pid = std::to_string(pair.first);

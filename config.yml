@@ -1,6 +1,6 @@
 programs:
   sleeper:
-    cmd: "sleep 1000"
+    cmd: "sleep 5"
     numprocs: 2
     umask: 022
     workingdir: .
@@ -34,7 +34,7 @@ programs:
     numprocs: 1
     umask: 022
     workingdir: .
-    autostart: false
+    autostart: true
     exitcodes: [0]
     startretries: 1
     starttime: 1
